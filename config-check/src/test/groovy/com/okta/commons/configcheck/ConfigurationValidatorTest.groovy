@@ -19,6 +19,8 @@ import org.testng.Assert
 import org.testng.annotations.Test
 
 import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.allOf
+import static org.hamcrest.Matchers.both
 import static org.hamcrest.Matchers.containsString
 
 /**
@@ -35,7 +37,8 @@ class ConfigurationValidatorTest {
     @Test
     void httpBaseUrl() {
         def e = expect {ConfigurationValidator.validateHttpsUrl("http://okta.example.com")}
-        assertThat(e.message, containsString("Your Okta URL must start with https"))
+        assertThat(e.message, allOf(containsString("Your Okta URL must start with https"),
+                                   containsString("http://okta.example.com")))
     }
 
     @Test
@@ -47,7 +50,8 @@ class ConfigurationValidatorTest {
     @Test
     void adminBaseUrl() {
         def e = expect {ConfigurationValidator.validateHttpsUrl("https://example-admin.okta.com")}
-        assertThat(e.message, containsString("Your Okta domain should not contain -admin"))
+        assertThat(e.message, allOf(containsString("Your Okta domain should not contain -admin"),
+                                   containsString("https://example-admin.okta.com")))
 
         e = expect {ConfigurationValidator.validateHttpsUrl("https://example-admin.oktapreview.com")}
         assertThat(e.message, containsString("Your Okta domain should not contain -admin"))
@@ -59,7 +63,8 @@ class ConfigurationValidatorTest {
     @Test
     void doubleComBaseUrl() {
         def e = expect {ConfigurationValidator.validateHttpsUrl("https://okta.example.com.com")}
-        assertThat(e.message, containsString("It looks like there's a typo in your Okta domain"))
+        assertThat(e.message, allOf(containsString("It looks like there's a typo in your Okta domain"),
+                                   containsString("https://okta.example.com.com")))
 
         e = expect {ConfigurationValidator.validateHttpsUrl("https://okta.example.com.com/some/path")}
         assertThat(e.message, containsString("It looks like there's a typo in your Okta domain"))

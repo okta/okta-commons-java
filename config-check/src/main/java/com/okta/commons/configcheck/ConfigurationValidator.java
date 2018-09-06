@@ -17,6 +17,7 @@ package com.okta.commons.configcheck;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 /**
@@ -45,21 +46,21 @@ public final class ConfigurationValidator {
 
         hasText(url, ERRORS.getString("orgUrl.missing"));
         doesNotContain(url, "{yourOktaDomain}", ERRORS.getString("orgUrl.containsBrackets"));
-        doesNotContain(url, "-admin.okta.com", ERRORS.getString("orgUrl.containsAdmin"));
-        doesNotContain(url, "-admin.oktapreview.com", ERRORS.getString("orgUrl.containsAdmin"));
-        doesNotContain(url, "-admin.okta-emea.com", ERRORS.getString("orgUrl.containsAdmin"));
+        doesNotContain(url, "-admin.okta.com", formattedErrorMessage("orgUrl.containsAdmin", url));
+        doesNotContain(url, "-admin.oktapreview.com", formattedErrorMessage("orgUrl.containsAdmin", url));
+        doesNotContain(url, "-admin.okta-emea.com", formattedErrorMessage("orgUrl.containsAdmin", url));
 
         try {
             URL tempUrl = new URL(url);
             if (!"https".equalsIgnoreCase(tempUrl.getProtocol())) {
-                throw new IllegalArgumentException(ERRORS.getString("orgUrl.nonHttpsInvalid"));
+                throw new IllegalArgumentException(formattedErrorMessage("orgUrl.nonHttpsInvalid", url));
             }
             if (tempUrl.getHost().endsWith(".com.com")){
-                throw new IllegalArgumentException(ERRORS.getString("orgUrl.invalid"));
+                throw new IllegalArgumentException(formattedErrorMessage("orgUrl.invalid", url));
             }
 
         } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(ERRORS.getString("orgUrl.invalid"), e);
+            throw new IllegalArgumentException(formattedErrorMessage("orgUrl.invalid", url), e);
         }
     }
 
@@ -88,6 +89,11 @@ public final class ConfigurationValidator {
     public static void validateClientSecret(String clientSecret) {
         hasText(clientSecret, ERRORS.getString("clientSecret.missing"));
         doesNotContain(clientSecret, "{clientSecret}",  ERRORS.getString("clientSecret.containsBrackets"));
+    }
+
+    private static String formattedErrorMessage(String messageKey, Object... args) {
+        String message = ERRORS.getString(messageKey);
+        return MessageFormat.format(message, args);
     }
 
     /*
