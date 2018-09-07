@@ -18,6 +18,8 @@ package com.okta.commons.configcheck
 import org.testng.Assert
 import org.testng.annotations.Test
 
+import java.util.concurrent.atomic.AtomicBoolean
+
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.both
@@ -100,6 +102,13 @@ class ConfigurationValidatorTest {
     }
 
     @Test
+    void nullClientIdFunctional() {
+        AtomicBoolean result = new AtomicBoolean(true)
+        ConfigurationValidator.validateClientId(null).ifInvalid({result.set(it.isValid())})
+        assertThat("ifInvalid did not call consumer", !result.get())
+    }
+
+    @Test
     void bracketClientId() {
         def e = expect {ConfigurationValidator.assertClientId("{clientId}")}
         assertThat(e.message, containsString("Replace {clientId} with the client ID of your Application"))
@@ -111,6 +120,12 @@ class ConfigurationValidatorTest {
         ConfigurationValidator.assertClientId("some-other-text")
     }
 
+    @Test
+    void functionalValidClientId() {
+        AtomicBoolean result = new AtomicBoolean(true)
+        ConfigurationValidator.validateClientId("some-client-id").ifInvalid({result.set(it.isValid())})
+        assertThat("ifInvalid called the consumer, and should not have been with a valid clientId", result.get())
+    }
 
     @Test
     void nullClientSecret() {
