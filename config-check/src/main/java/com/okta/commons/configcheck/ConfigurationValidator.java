@@ -42,53 +42,91 @@ public final class ConfigurationValidator {
      * </ul>
      * @param url The url to be validated
      */
-    public static void validateHttpsUrl(String url) {
+    public static void assertHttpsUrl(String url) {
+        validateHttpsUrl(url).throwIfInvalid();
+    }
 
-        hasText(url, ERRORS.getString("orgUrl.missing"));
-        doesNotContain(url, "{yourOktaDomain}", ERRORS.getString("orgUrl.containsBrackets"));
-        doesNotContain(url, "-admin.okta.com", formattedErrorMessage("orgUrl.containsAdmin", url));
-        doesNotContain(url, "-admin.oktapreview.com", formattedErrorMessage("orgUrl.containsAdmin", url));
-        doesNotContain(url, "-admin.okta-emea.com", formattedErrorMessage("orgUrl.containsAdmin", url));
+    public static ValidationResponse validateHttpsUrl(String url) {
 
-        try {
-            URL tempUrl = new URL(url);
-            if (!"https".equalsIgnoreCase(tempUrl.getProtocol())) {
-                throw new IllegalArgumentException(formattedErrorMessage("orgUrl.nonHttpsInvalid", url));
+        ValidationResponse response = new ValidationResponse();
+        if (!hasText(url)) {
+            response.setMessage(ERRORS.getString("orgUrl.missing"));
+        } else if (contains(url, "{yourOktaDomain}")) {
+            response.setMessage(ERRORS.getString("orgUrl.containsBrackets"));
+        } else {
+            try {
+                URL tempUrl = new URL(url);
+                if (!"https".equalsIgnoreCase(tempUrl.getProtocol())) {
+                    response.setMessage(formattedErrorMessage("orgUrl.nonHttpsInvalid", url));
+                } else if (tempUrl.getHost().endsWith(".com.com")){
+                    response.setMessage(formattedErrorMessage("orgUrl.invalid", url));
+                } else if (tempUrl.getHost().endsWith("-admin.okta.com")
+                           || tempUrl.getHost().endsWith("-admin.oktapreview.com")
+                           || tempUrl.getHost().endsWith("-admin.okta-emea.com")){
+                    response.setMessage(formattedErrorMessage("orgUrl.containsAdmin", url));
+                }
+
+            } catch (MalformedURLException e) {
+                response.setMessage(formattedErrorMessage("orgUrl.invalid", url))
+                        .setException(e);
             }
-            if (tempUrl.getHost().endsWith(".com.com")){
-                throw new IllegalArgumentException(formattedErrorMessage("orgUrl.invalid", url));
-            }
-
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(formattedErrorMessage("orgUrl.invalid", url), e);
         }
+
+        return response;
     }
 
     /**
      * Validates that an API token is not null and contains does not contain the string {@code {apiToken}}.
      * @param token The API Token to be validated
      */
-    public static void validateApiToken(String token) {
-        hasText(token, ERRORS.getString("apiToken.missing"));
-        doesNotContain(token, "{apiToken}",  ERRORS.getString("apiToken.invalid"));
+    public static void assertApiToken(String token) {
+        validateApiToken(token).throwIfInvalid();
+    }
+
+    public static ValidationResponse validateApiToken(String token) {
+        ValidationResponse response = new ValidationResponse();
+        if (!hasText(token)) {
+            response.setMessage(ERRORS.getString("apiToken.missing"));
+        } else if (contains(token, "{apiToken}")) {
+            response.setMessage(ERRORS.getString("apiToken.containsBrackets"));
+        }
+        return response;
     }
 
     /**
      * Validates that a client Id is not null and contains does not contain the string {@code {apiToken}}.
      * @param clientId The Client Id to be validated
      */
-    public static void validateClientId(String clientId) {
-        hasText(clientId, ERRORS.getString("clientId.missing"));
-        doesNotContain(clientId, "{clientId}",  ERRORS.getString("clientId.containsBrackets"));
+    public static void assertClientId(String clientId) {
+        validateClientId(clientId).throwIfInvalid();
+    }
+
+    public static ValidationResponse validateClientId(String clientId) {
+        ValidationResponse response = new ValidationResponse();
+        if (!hasText(clientId)) {
+            response.setMessage(ERRORS.getString("clientId.missing"));
+        } else if (contains(clientId, "{clientId}")) {
+            response.setMessage(ERRORS.getString("clientId.containsBrackets"));
+        }
+        return response;
     }
 
     /**
      * Validates that a client secret is not null and contains does not contain the string {@code {clientSecret}}.
      * @param clientSecret the Client Secret to be validated
      */
-    public static void validateClientSecret(String clientSecret) {
-        hasText(clientSecret, ERRORS.getString("clientSecret.missing"));
-        doesNotContain(clientSecret, "{clientSecret}",  ERRORS.getString("clientSecret.containsBrackets"));
+    public static void assertClientSecret(String clientSecret) {
+        validateClientSecret(clientSecret).throwIfInvalid();
+    }
+
+    public static ValidationResponse validateClientSecret(String clientSecret) {
+        ValidationResponse response = new ValidationResponse();
+        if (!hasText(clientSecret)) {
+            response.setMessage(ERRORS.getString("clientSecret.missing"));
+        } else if (contains(clientSecret, "{clientSecret}")) {
+            response.setMessage(ERRORS.getString("clientSecret.containsBrackets"));
+        }
+        return response;
     }
 
     private static String formattedErrorMessage(String messageKey, Object... args) {
@@ -100,17 +138,10 @@ public final class ConfigurationValidator {
      *  private methods copied from com.okta.sdk.lang.Assert, can be updated if we pull that out of the SDK project
      */
 
-    private static void doesNotContain(String textToSearch, String substring, String message) {
-        if (hasLength(textToSearch) && hasLength(substring) &&
-                textToSearch.contains(substring)) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-
-    private static void hasText(String text, String message) {
-        if (!hasText(text)) {
-            throw new IllegalArgumentException(message);
-        }
+    private static boolean contains(String textToSearch, String substring) {
+        return hasLength(textToSearch)
+                && hasLength(substring)
+                && textToSearch.contains(substring);
     }
 
     private static boolean hasText(CharSequence str) {
