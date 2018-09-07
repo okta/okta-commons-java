@@ -43,7 +43,7 @@ public final class ConfigurationValidator {
      * @param url The url to be validated
      */
     public static void assertHttpsUrl(String url) {
-        validateHttpsUrl(url).throwIfInvalid();
+        validateHttpsUrl(url).ifInvalidThrow();
     }
 
     public static ValidationResponse validateHttpsUrl(String url) {
@@ -80,7 +80,7 @@ public final class ConfigurationValidator {
      * @param token The API Token to be validated
      */
     public static void assertApiToken(String token) {
-        validateApiToken(token).throwIfInvalid();
+        validateApiToken(token).ifInvalidThrow();
     }
 
     public static ValidationResponse validateApiToken(String token) {
@@ -98,7 +98,7 @@ public final class ConfigurationValidator {
      * @param clientId The Client Id to be validated
      */
     public static void assertClientId(String clientId) {
-        validateClientId(clientId).throwIfInvalid();
+        validateClientId(clientId).ifInvalidThrow();
     }
 
     public static ValidationResponse validateClientId(String clientId) {
@@ -116,7 +116,7 @@ public final class ConfigurationValidator {
      * @param clientSecret the Client Secret to be validated
      */
     public static void assertClientSecret(String clientSecret) {
-        validateClientSecret(clientSecret).throwIfInvalid();
+        validateClientSecret(clientSecret).ifInvalidThrow();
     }
 
     public static ValidationResponse validateClientSecret(String clientSecret) {
