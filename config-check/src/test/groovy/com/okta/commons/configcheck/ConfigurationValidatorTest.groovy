@@ -30,104 +30,104 @@ class ConfigurationValidatorTest {
     
     @Test
     void nullBaseUrl() {
-        def e = expect {ConfigurationValidator.validateHttpsUrl(null)}
+        def e = expect {ConfigurationValidator.assertHttpsUrl(null)}
         assertThat(e.message,containsString("Your Okta URL is missing"))
     }
 
     @Test
     void httpBaseUrl() {
-        def e = expect {ConfigurationValidator.validateHttpsUrl("http://okta.example.com")}
+        def e = expect {ConfigurationValidator.assertHttpsUrl("http://okta.example.com")}
         assertThat(e.message, allOf(containsString("Your Okta URL must start with https"),
                                    containsString("http://okta.example.com")))
     }
 
     @Test
     void bracketBaseUrl() {
-        def e = expect {ConfigurationValidator.validateHttpsUrl("https://{yourOktaDomain}")}
+        def e = expect {ConfigurationValidator.assertHttpsUrl("https://{yourOktaDomain}")}
         assertThat(e.message, containsString("Replace {yourOktaDomain} with your Okta domain"))
     }
 
     @Test
     void adminBaseUrl() {
-        def e = expect {ConfigurationValidator.validateHttpsUrl("https://example-admin.okta.com")}
+        def e = expect {ConfigurationValidator.assertHttpsUrl("https://example-admin.okta.com")}
         assertThat(e.message, allOf(containsString("Your Okta domain should not contain -admin"),
                                    containsString("https://example-admin.okta.com")))
 
-        e = expect {ConfigurationValidator.validateHttpsUrl("https://example-admin.oktapreview.com")}
+        e = expect {ConfigurationValidator.assertHttpsUrl("https://example-admin.oktapreview.com")}
         assertThat(e.message, containsString("Your Okta domain should not contain -admin"))
 
-         e = expect {ConfigurationValidator.validateHttpsUrl("https://example-admin.okta-emea.com")}
+         e = expect {ConfigurationValidator.assertHttpsUrl("https://example-admin.okta-emea.com")}
         assertThat(e.message, containsString("Your Okta domain should not contain -admin"))
     }
 
     @Test
     void doubleComBaseUrl() {
-        def e = expect {ConfigurationValidator.validateHttpsUrl("https://okta.example.com.com")}
+        def e = expect {ConfigurationValidator.assertHttpsUrl("https://okta.example.com.com")}
         assertThat(e.message, allOf(containsString("It looks like there's a typo in your Okta domain"),
                                    containsString("https://okta.example.com.com")))
 
-        e = expect {ConfigurationValidator.validateHttpsUrl("https://okta.example.com.com/some/path")}
+        e = expect {ConfigurationValidator.assertHttpsUrl("https://okta.example.com.com/some/path")}
         assertThat(e.message, containsString("It looks like there's a typo in your Okta domain"))
 
         // this line should NOT throw
-        ConfigurationValidator.validateHttpsUrl("https://example.com.commercial.com")
+        ConfigurationValidator.assertHttpsUrl("https://example.com.commercial.com")
         // xcomxcom would match a regex, so make sure we are matching exactly
-        ConfigurationValidator.validateHttpsUrl("https://okta.examplexcomxcom/some/path")
+        ConfigurationValidator.assertHttpsUrl("https://okta.examplexcomxcom/some/path")
     }
 
     @Test
     void nullApiToken() {
-        def e = expect {ConfigurationValidator.validateApiToken(null)}
+        def e = expect {ConfigurationValidator.assertApiToken(null)}
         assertThat(e.message, containsString("Your Okta API token is missing"))
     }
 
     @Test
     void bracketApiToken() {
-        def e = expect {ConfigurationValidator.validateApiToken("{apiToken}")}
+        def e = expect {ConfigurationValidator.assertApiToken("{apiToken}")}
         assertThat(e.message, containsString("Replace {apiToken} with your Okta API token"))
     }
 
     @Test
     void validApiToken() {
         // just make sure it doesn't throw
-        ConfigurationValidator.validateApiToken("some-other-text")
+        ConfigurationValidator.assertApiToken("some-other-text")
     }
 
     @Test
     void nullClientId() {
-        def e = expect {ConfigurationValidator.validateClientId(null)}
+        def e = expect {ConfigurationValidator.assertClientId(null)}
         assertThat(e.message, containsString("Your client ID is missing"))
     }
 
     @Test
     void bracketClientId() {
-        def e = expect {ConfigurationValidator.validateClientId("{clientId}")}
+        def e = expect {ConfigurationValidator.assertClientId("{clientId}")}
         assertThat(e.message, containsString("Replace {clientId} with the client ID of your Application"))
     }
 
     @Test
     void validClientId() {
         // just make sure it doesn't throw
-        ConfigurationValidator.validateClientId("some-other-text")
+        ConfigurationValidator.assertClientId("some-other-text")
     }
 
 
     @Test
     void nullClientSecret() {
-        def e = expect {ConfigurationValidator.validateClientSecret(null)}
+        def e = expect {ConfigurationValidator.assertClientSecret(null)}
         assertThat(e.message, containsString("Your client secret is missing"))
     }
 
     @Test
     void bracketClientSecret() {
-        def e = expect {ConfigurationValidator.validateClientSecret("{clientSecret}")}
+        def e = expect {ConfigurationValidator.assertClientSecret("{clientSecret}")}
         assertThat(e.message, containsString("Replace {clientSecret} with the client secret of your Application"))
     }
 
     @Test
     void validClientSecret() {
         // just make sure it doesn't throw
-        ConfigurationValidator.validateClientSecret("some-other-text")
+        ConfigurationValidator.assertClientSecret("some-other-text")
     }
     
     static def expect = { Closure callMe ->
