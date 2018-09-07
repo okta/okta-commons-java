@@ -15,11 +15,15 @@
  */
 package com.okta.commons.configcheck;
 
+import java.util.function.Consumer;
+
 public class ValidationResponse {
 
     private boolean valid = true;
     private String message;
     private Exception exception;
+
+    ValidationResponse() {}
 
     public boolean isValid() {
         return valid;
@@ -35,12 +39,18 @@ public class ValidationResponse {
         return this;
     }
 
-    public void throwIfInvalid() {
-        if (!valid) {
+    public void ifInvalidThrow() {
+        ifInvalid(res -> {
             if (exception == null) {
                 throw new IllegalArgumentException(message);
             }
             throw new IllegalArgumentException(message, exception);
+        });
+    }
+
+    public void ifInvalid(Consumer<ValidationResponse> consumer) {
+        if (!valid) {
+            consumer.accept(this);
         }
     }
 
@@ -53,7 +63,7 @@ public class ValidationResponse {
         return this;
     }
 
-    public static ValidationResponse valid() {
+    static ValidationResponse valid() {
         return new ValidationResponse();
     }
 }
