@@ -32,7 +32,7 @@ public final class ConfigurationValidator {
     private ConfigurationValidator() {}
 
     /**
-     * Validates the {code url} is a well formed HTTPS URL and does not contain common typos.  The checks include:
+     * Validates the {@code url} is a well formed HTTPS URL and does not contain common typos.  The checks include:
      * <ul>
      *     <li>Contains {yourOktaDomain}</li>
      *     <li>Hostname ends with .com.com</li>
@@ -42,37 +42,12 @@ public final class ConfigurationValidator {
      * </ul>
      * @param url The url to be validated
      */
-    public static void assertHttpsUrl(String url) {
-        validateHttpsUrl(url).ifInvalidThrow();
+    public static void assertOrgUrl(String url) {
+        validateOrgUrl(url).ifInvalidThrow();
     }
 
-    public static ValidationResponse validateHttpsUrl(String url) {
-
-        ValidationResponse response = new ValidationResponse();
-        if (!hasText(url)) {
-            response.setMessage(ERRORS.getString("orgUrl.missing"));
-        } else if (contains(url, "{yourOktaDomain}")) {
-            response.setMessage(ERRORS.getString("orgUrl.containsBrackets"));
-        } else {
-            try {
-                URL tempUrl = new URL(url);
-                if (!"https".equalsIgnoreCase(tempUrl.getProtocol())) {
-                    response.setMessage(formattedErrorMessage("orgUrl.nonHttpsInvalid", url));
-                } else if (tempUrl.getHost().endsWith(".com.com")){
-                    response.setMessage(formattedErrorMessage("orgUrl.invalid", url));
-                } else if (tempUrl.getHost().endsWith("-admin.okta.com")
-                           || tempUrl.getHost().endsWith("-admin.oktapreview.com")
-                           || tempUrl.getHost().endsWith("-admin.okta-emea.com")){
-                    response.setMessage(formattedErrorMessage("orgUrl.containsAdmin", url));
-                }
-
-            } catch (MalformedURLException e) {
-                response.setMessage(formattedErrorMessage("orgUrl.invalid", url))
-                        .setException(e);
-            }
-        }
-
-        return response;
+    public static ValidationResponse validateOrgUrl(String url) {
+        return validateHttpsUrl(url, "orgUrl");
     }
 
     /**
@@ -91,6 +66,25 @@ public final class ConfigurationValidator {
             response.setMessage(ERRORS.getString("apiToken.containsBrackets"));
         }
         return response;
+    }
+
+    /**
+     * Validates the {@code url} is a well formed HTTPS URL and does not contain common typos.  The checks include:
+     * <ul>
+     *     <li>Contains {yourOktaDomain}</li>
+     *     <li>Hostname ends with .com.com</li>
+     *     <li>Contains -admin.okta.com</li>
+     *     <li>Contains -admin.oktapreview.com</li>
+     *     <li>Contains -admin.okta-emea.com</li>
+     * </ul>
+     * @param url The url to be validated
+     */
+    public static void assertIssuer(String url) {
+        validateIssuer(url).ifInvalidThrow();
+    }
+
+    public static ValidationResponse validateIssuer(String url) {
+        return validateHttpsUrl(url, "issuerUrl");
     }
 
     /**
@@ -132,6 +126,34 @@ public final class ConfigurationValidator {
     private static String formattedErrorMessage(String messageKey, Object... args) {
         String message = ERRORS.getString(messageKey);
         return MessageFormat.format(message, args);
+    }
+
+    private static ValidationResponse validateHttpsUrl(String url, String keyPrefix) {
+        ValidationResponse response = new ValidationResponse();
+        if (!hasText(url)) {
+            response.setMessage(ERRORS.getString(keyPrefix + ".missing"));
+        } else if (contains(url, "{yourOktaDomain}")) {
+            response.setMessage(ERRORS.getString(keyPrefix + ".containsBrackets"));
+        } else {
+            try {
+                URL tempUrl = new URL(url);
+                if (!"https".equalsIgnoreCase(tempUrl.getProtocol())) {
+                    response.setMessage(formattedErrorMessage(keyPrefix + ".nonHttpsInvalid", url));
+                } else if (tempUrl.getHost().endsWith(".com.com")){
+                    response.setMessage(formattedErrorMessage(keyPrefix + ".invalid", url));
+                } else if (tempUrl.getHost().endsWith("-admin.okta.com")
+                           || tempUrl.getHost().endsWith("-admin.oktapreview.com")
+                           || tempUrl.getHost().endsWith("-admin.okta-emea.com")){
+                    response.setMessage(formattedErrorMessage(keyPrefix + ".containsAdmin", url));
+                }
+
+            } catch (MalformedURLException e) {
+                response.setMessage(formattedErrorMessage(keyPrefix + ".invalid", url))
+                        .setException(e);
+            }
+        }
+
+        return response;
     }
 
     /*

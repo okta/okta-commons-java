@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.allOf
-import static org.hamcrest.Matchers.both
 import static org.hamcrest.Matchers.containsString
 
 /**
@@ -32,49 +31,49 @@ class ConfigurationValidatorTest {
     
     @Test
     void nullBaseUrl() {
-        def e = expect {ConfigurationValidator.assertHttpsUrl(null)}
+        def e = expect {ConfigurationValidator.assertOrgUrl(null)}
         assertThat(e.message,containsString("Your Okta URL is missing"))
     }
 
     @Test
     void httpBaseUrl() {
-        def e = expect {ConfigurationValidator.assertHttpsUrl("http://okta.example.com")}
+        def e = expect {ConfigurationValidator.assertOrgUrl("http://okta.example.com")}
         assertThat(e.message, allOf(containsString("Your Okta URL must start with https"),
                                    containsString("http://okta.example.com")))
     }
 
     @Test
     void bracketBaseUrl() {
-        def e = expect {ConfigurationValidator.assertHttpsUrl("https://{yourOktaDomain}")}
+        def e = expect {ConfigurationValidator.assertOrgUrl("https://{yourOktaDomain}")}
         assertThat(e.message, containsString("Replace {yourOktaDomain} with your Okta domain"))
     }
 
     @Test
     void adminBaseUrl() {
-        def e = expect {ConfigurationValidator.assertHttpsUrl("https://example-admin.okta.com")}
+        def e = expect {ConfigurationValidator.assertOrgUrl("https://example-admin.okta.com")}
         assertThat(e.message, allOf(containsString("Your Okta domain should not contain -admin"),
                                    containsString("https://example-admin.okta.com")))
 
-        e = expect {ConfigurationValidator.assertHttpsUrl("https://example-admin.oktapreview.com")}
+        e = expect {ConfigurationValidator.assertOrgUrl("https://example-admin.oktapreview.com")}
         assertThat(e.message, containsString("Your Okta domain should not contain -admin"))
 
-         e = expect {ConfigurationValidator.assertHttpsUrl("https://example-admin.okta-emea.com")}
+         e = expect {ConfigurationValidator.assertOrgUrl("https://example-admin.okta-emea.com")}
         assertThat(e.message, containsString("Your Okta domain should not contain -admin"))
     }
 
     @Test
     void doubleComBaseUrl() {
-        def e = expect {ConfigurationValidator.assertHttpsUrl("https://okta.example.com.com")}
+        def e = expect {ConfigurationValidator.assertOrgUrl("https://okta.example.com.com")}
         assertThat(e.message, allOf(containsString("It looks like there's a typo in your Okta domain"),
                                    containsString("https://okta.example.com.com")))
 
-        e = expect {ConfigurationValidator.assertHttpsUrl("https://okta.example.com.com/some/path")}
+        e = expect {ConfigurationValidator.assertOrgUrl("https://okta.example.com.com/some/path")}
         assertThat(e.message, containsString("It looks like there's a typo in your Okta domain"))
 
         // this line should NOT throw
-        ConfigurationValidator.assertHttpsUrl("https://example.com.commercial.com")
+        ConfigurationValidator.assertOrgUrl("https://example.com.commercial.com")
         // xcomxcom would match a regex, so make sure we are matching exactly
-        ConfigurationValidator.assertHttpsUrl("https://okta.examplexcomxcom/some/path")
+        ConfigurationValidator.assertOrgUrl("https://okta.examplexcomxcom/some/path")
     }
 
     @Test
@@ -93,6 +92,50 @@ class ConfigurationValidatorTest {
     void validApiToken() {
         // just make sure it doesn't throw
         ConfigurationValidator.assertApiToken("some-other-text")
+    }
+
+     @Test
+    void nullIssuerUrl() {
+        def e = expect {ConfigurationValidator.assertIssuer(null)}
+        assertThat(e.message,containsString("Your Okta Issuer URL is missing"))
+    }
+
+    @Test
+    void httpIssuerUrl() {
+        def e = expect {ConfigurationValidator.assertIssuer("http://okta.example.com/oauth/default")}
+        assertThat(e.message, allOf(containsString("Your Okta Issuer URL must start with https"),
+                                   containsString("http://okta.example.com")))
+    }
+
+    @Test
+    void bracketIssuerUrl() {
+        def e = expect {ConfigurationValidator.assertIssuer("https://{yourOktaDomain}/oauth/default")}
+        assertThat(e.message, containsString("Replace {yourOktaDomain} with your Okta domain"))
+    }
+
+    @Test
+    void adminIssuerUrl() {
+        def e = expect {ConfigurationValidator.assertIssuer("https://example-admin.okta.com/oauth/default")}
+        assertThat(e.message, allOf(containsString("Your Okta Issuer URL should not contain -admin"),
+                                   containsString("https://example-admin.okta.com/oauth/default")))
+
+        e = expect {ConfigurationValidator.assertIssuer("https://example-admin.oktapreview.com/oauth/default")}
+        assertThat(e.message, containsString("Your Okta Issuer URL should not contain -admin"))
+
+         e = expect {ConfigurationValidator.assertIssuer("https://example-admin.okta-emea.com/oauth/default")}
+        assertThat(e.message, containsString("Your Okta Issuer URL should not contain -admin"))
+    }
+
+    @Test
+    void doubleComIssuerUrl() {
+        def e = expect {ConfigurationValidator.assertIssuer("https://okta.example.com.com/oauth/default")}
+        assertThat(e.message, allOf(containsString("It looks like there's a typo in your Okta Issuer URL"),
+                                   containsString("https://okta.example.com.com/oauth/default")))
+
+        // this line should NOT throw
+        ConfigurationValidator.assertIssuer("https://example.com.commercial.com")
+        // xcomxcom would match a regex, so make sure we are matching exactly
+        ConfigurationValidator.assertIssuer("https://okta.examplexcomxcom/oauth/default")
     }
 
     @Test
