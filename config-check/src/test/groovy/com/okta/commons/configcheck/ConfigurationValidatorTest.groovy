@@ -86,6 +86,9 @@ class ConfigurationValidatorTest {
     void bracketApiToken() {
         def e = expect {ConfigurationValidator.assertApiToken("{apiToken}")}
         assertThat(e.message, containsString("Replace {apiToken} with your Okta API token"))
+
+        e = expect {ConfigurationValidator.assertApiToken("{aPiToKeN}")}
+        assertThat(e.message, containsString("Replace {apiToken} with your Okta API token"))
     }
 
     @Test
@@ -105,11 +108,18 @@ class ConfigurationValidatorTest {
         def e = expect {ConfigurationValidator.assertIssuer("http://okta.example.com/oauth/default")}
         assertThat(e.message, allOf(containsString("Your Okta Issuer URL must start with https"),
                                    containsString("http://okta.example.com")))
+
+        e = expect {ConfigurationValidator.assertIssuer("HTTP://okta.example.com/oauth/default")}
+        assertThat(e.message, allOf(containsString("Your Okta Issuer URL must start with https"),
+                                   containsString("HTTP://okta.example.com")))
     }
 
     @Test
     void bracketIssuerUrl() {
         def e = expect {ConfigurationValidator.assertIssuer("https://{yourOktaDomain}/oauth/default")}
+        assertThat(e.message, containsString("Replace {yourOktaDomain} with your Okta domain"))
+
+        e = expect {ConfigurationValidator.assertIssuer("https://{yOurOkTaDoMaIn}/oauth/default")}
         assertThat(e.message, containsString("Replace {yourOktaDomain} with your Okta domain"))
     }
 
@@ -122,7 +132,10 @@ class ConfigurationValidatorTest {
         e = expect {ConfigurationValidator.assertIssuer("https://example-admin.oktapreview.com/oauth/default")}
         assertThat(e.message, containsString("Your Okta Issuer URL should not contain -admin"))
 
-         e = expect {ConfigurationValidator.assertIssuer("https://example-admin.okta-emea.com/oauth/default")}
+        e = expect {ConfigurationValidator.assertIssuer("https://example-admin.okta-emea.com/oauth/default")}
+        assertThat(e.message, containsString("Your Okta Issuer URL should not contain -admin"))
+
+        e = expect {ConfigurationValidator.assertIssuer("https://example-aDmIn.okTa-emea.com/oauth/default")}
         assertThat(e.message, containsString("Your Okta Issuer URL should not contain -admin"))
     }
 
@@ -132,8 +145,13 @@ class ConfigurationValidatorTest {
         assertThat(e.message, allOf(containsString("It looks like there's a typo in your Okta Issuer URL"),
                                    containsString("https://okta.example.com.com/oauth/default")))
 
+        e = expect {ConfigurationValidator.assertIssuer("https://okta.example.cOm.CoM/oauth/default")}
+        assertThat(e.message, allOf(containsString("It looks like there's a typo in your Okta Issuer URL"),
+                                   containsString("https://okta.example.cOm.CoM/oauth/default")))
+
         // this line should NOT throw
         ConfigurationValidator.assertIssuer("https://example.com.commercial.com")
+        ConfigurationValidator.assertIssuer("https://example.COM.commercial.com")
         // xcomxcom would match a regex, so make sure we are matching exactly
         ConfigurationValidator.assertIssuer("https://okta.examplexcomxcom/oauth/default")
     }
@@ -154,6 +172,9 @@ class ConfigurationValidatorTest {
     @Test
     void bracketClientId() {
         def e = expect {ConfigurationValidator.assertClientId("{clientId}")}
+        assertThat(e.message, containsString("Replace {clientId} with the client ID of your Application"))
+
+        e = expect {ConfigurationValidator.assertClientId("{cLiEntId}")}
         assertThat(e.message, containsString("Replace {clientId} with the client ID of your Application"))
     }
 
@@ -179,6 +200,9 @@ class ConfigurationValidatorTest {
     @Test
     void bracketClientSecret() {
         def e = expect {ConfigurationValidator.assertClientSecret("{clientSecret}")}
+        assertThat(e.message, containsString("Replace {clientSecret} with the client secret of your Application"))
+
+        e = expect {ConfigurationValidator.assertClientSecret("{ClIeNtSeCrEt}")}
         assertThat(e.message, containsString("Replace {clientSecret} with the client secret of your Application"))
     }
 
