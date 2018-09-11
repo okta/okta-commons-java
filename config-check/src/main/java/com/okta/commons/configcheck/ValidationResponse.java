@@ -41,9 +41,6 @@ public class ValidationResponse {
 
     public void ifInvalidThrow() {
         ifInvalid(res -> {
-            if (exception == null) {
-                throw new IllegalArgumentException(message);
-            }
             throw new IllegalArgumentException(message, exception);
         });
     }
