@@ -20,6 +20,8 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
+import static java.util.Locale.ENGLISH;
+
 /**
  * Configuration validation helper class to help validation of common configuration strings.
  *
@@ -62,7 +64,7 @@ public final class ConfigurationValidator {
         ValidationResponse response = new ValidationResponse();
         if (!hasText(token)) {
             response.setMessage(ERRORS.getString("apiToken.missing"));
-        } else if (contains(token, "{apiToken}")) {
+        } else if (containsCaseInsensitive(token, "{apitoken}")) {
             response.setMessage(ERRORS.getString("apiToken.containsBrackets"));
         }
         return response;
@@ -99,7 +101,7 @@ public final class ConfigurationValidator {
         ValidationResponse response = new ValidationResponse();
         if (!hasText(clientId)) {
             response.setMessage(ERRORS.getString("clientId.missing"));
-        } else if (contains(clientId, "{clientId}")) {
+        } else if (containsCaseInsensitive(clientId, "{clientid}")) {
             response.setMessage(ERRORS.getString("clientId.containsBrackets"));
         }
         return response;
@@ -117,7 +119,7 @@ public final class ConfigurationValidator {
         ValidationResponse response = new ValidationResponse();
         if (!hasText(clientSecret)) {
             response.setMessage(ERRORS.getString("clientSecret.missing"));
-        } else if (contains(clientSecret, "{clientSecret}")) {
+        } else if (containsCaseInsensitive(clientSecret, "{clientsecret}")) {
             response.setMessage(ERRORS.getString("clientSecret.containsBrackets"));
         }
         return response;
@@ -132,21 +134,21 @@ public final class ConfigurationValidator {
         ValidationResponse response = new ValidationResponse();
         if (!hasText(url)) {
             response.setMessage(ERRORS.getString(keyPrefix + ".missing"));
-        } else if (contains(url, "{yourOktaDomain}")) {
+        } else if (containsCaseInsensitive(url, "{youroktadomain}")) {
             response.setMessage(ERRORS.getString(keyPrefix + ".containsBrackets"));
         } else {
             try {
                 URL tempUrl = new URL(url);
+                String host = tempUrl.getHost().toLowerCase(ENGLISH);
                 if (!"https".equalsIgnoreCase(tempUrl.getProtocol())) {
                     response.setMessage(formattedErrorMessage(keyPrefix + ".nonHttpsInvalid", url));
-                } else if (tempUrl.getHost().endsWith(".com.com")){
+                } else if (host.endsWith(".com.com")){
                     response.setMessage(formattedErrorMessage(keyPrefix + ".invalid", url));
-                } else if (tempUrl.getHost().endsWith("-admin.okta.com")
-                           || tempUrl.getHost().endsWith("-admin.oktapreview.com")
-                           || tempUrl.getHost().endsWith("-admin.okta-emea.com")){
-                    response.setMessage(formattedErrorMessage(keyPrefix + ".containsAdmin", url));
+                } else if (host.endsWith("-admin.okta.com")
+                        || host.endsWith("-admin.oktapreview.com")
+                        || host.endsWith("-admin.okta-emea.com")){
+                        response.setMessage(formattedErrorMessage(keyPrefix + ".containsAdmin", url));
                 }
-
             } catch (MalformedURLException e) {
                 response.setMessage(formattedErrorMessage(keyPrefix + ".invalid", url))
                         .setException(e);
@@ -160,10 +162,10 @@ public final class ConfigurationValidator {
      *  private methods copied from com.okta.sdk.lang.Assert, can be updated if we pull that out of the SDK project
      */
 
-    private static boolean contains(String textToSearch, String substring) {
+    private static boolean containsCaseInsensitive(String textToSearch, String substring) {
         return hasLength(textToSearch)
                 && hasLength(substring)
-                && textToSearch.contains(substring);
+                && textToSearch.toLowerCase(ENGLISH).contains(substring);
     }
 
     private static boolean hasText(CharSequence str) {
