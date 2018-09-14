@@ -34,7 +34,7 @@ public final class ConfigurationValidator {
     private ConfigurationValidator() {}
 
     /**
-     * Validates the {@code url} is a well formed HTTPS URL and does not contain common typos.  The checks include:
+     * Asserts the {@code url} is a well formed HTTPS URL and does not contain common typos.  The checks include:
      * <ul>
      *     <li>Contains {yourOktaDomain}</li>
      *     <li>Hostname ends with .com.com</li>
@@ -42,23 +42,49 @@ public final class ConfigurationValidator {
      *     <li>Contains -admin.oktapreview.com</li>
      *     <li>Contains -admin.okta-emea.com</li>
      * </ul>
+     *
      * @param url The url to be validated
+     * @throws IllegalArgumentException Thrown if URL is invalid
      */
     public static void assertOrgUrl(String url) {
         validateOrgUrl(url).ifInvalidThrow();
     }
 
+    /**
+     * Returns a {@link ValidationResponse} checking to make sure the {@code url} is a well formed HTTPS URL and does
+     * not contain common typos.  The checks include:
+     * <ul>
+     *     <li>Contains {yourOktaDomain}</li>
+     *     <li>Hostname ends with .com.com</li>
+     *     <li>Contains -admin.okta.com</li>
+     *     <li>Contains -admin.oktapreview.com</li>
+     *     <li>Contains -admin.okta-emea.com</li>
+     * </ul>
+     *
+     * @param url The url to be validated
+     * @return a ValidationResponse containing the validation status and message (when invalid)
+     */
     public static ValidationResponse validateOrgUrl(String url) {
         return validateHttpsUrl(url, "orgUrl");
     }
 
     /**
-     * Validates that an API token is not null and contains does not contain the string {@code {apiToken}}.
+     * Asserts that an API token is not null and contains does not contain the string {@code {apiToken}}.
+     *
      * @param token The API Token to be validated
+     * @throws IllegalArgumentException Thrown if {@code token} is invalid
      */
     public static void assertApiToken(String token) {
         validateApiToken(token).ifInvalidThrow();
     }
+
+    /**
+     * Returns a {@link ValidationResponse} checking to make sure the API token is not null and
+     * contains does not contain the string {@code {apiToken}}.
+     *
+     * @param token The API Token to be validated
+     * @return a ValidationResponse containing the validation status and message (when invalid)
+     */
 
     public static ValidationResponse validateApiToken(String token) {
         ValidationResponse response = new ValidationResponse();
@@ -71,7 +97,7 @@ public final class ConfigurationValidator {
     }
 
     /**
-     * Validates the {@code url} is a well formed HTTPS URL and does not contain common typos.  The checks include:
+     * Asserts the {@code url} is a well formed HTTPS URL and does not contain common typos.  The checks include:
      * <ul>
      *     <li>Contains {yourOktaDomain}</li>
      *     <li>Hostname ends with .com.com</li>
@@ -79,24 +105,48 @@ public final class ConfigurationValidator {
      *     <li>Contains -admin.oktapreview.com</li>
      *     <li>Contains -admin.okta-emea.com</li>
      * </ul>
+     *
      * @param url The url to be validated
+     * @throws IllegalArgumentException Thrown if URL is invalid
      */
     public static void assertIssuer(String url) {
         validateIssuer(url).ifInvalidThrow();
     }
 
+    /**
+     * Returns a {@link ValidationResponse} checking the {@code url} is a well formed HTTPS URL and
+     * does not contain common typos.  The checks include:
+     * <ul>
+     *     <li>Contains {yourOktaDomain}</li>
+     *     <li>Hostname ends with .com.com</li>
+     *     <li>Contains -admin.okta.com</li>
+     *     <li>Contains -admin.oktapreview.com</li>
+     *     <li>Contains -admin.okta-emea.com</li>
+     * </ul>
+     *
+     * @param url The url to be validated
+     * @return a ValidationResponse containing the validation status and message (when invalid)
+     */
     public static ValidationResponse validateIssuer(String url) {
         return validateHttpsUrl(url, "issuerUrl");
     }
 
     /**
-     * Validates that a client Id is not null and contains does not contain the string {@code {apiToken}}.
-     * @param clientId The Client Id to be validated
+     * Asserts that a {@code clientId} is not null and contains does not contain the string {@code {clientId}}.
+     *
+     * @param clientId The client Id to be validated
+     * @throws IllegalArgumentException Thrown if URL is invalid
      */
     public static void assertClientId(String clientId) {
         validateClientId(clientId).ifInvalidThrow();
     }
 
+    /**
+     * Returns a {@link ValidationResponse} checking the {@code clientId} is not null and contains does not contain the string {@code {apiToclientIdken}}.
+     *
+     * @param clientId The client Id to be validated
+     * @return a ValidationResponse containing the validation status and message (when invalid)
+     */
     public static ValidationResponse validateClientId(String clientId) {
         ValidationResponse response = new ValidationResponse();
         if (!hasText(clientId)) {
@@ -108,13 +158,21 @@ public final class ConfigurationValidator {
     }
 
     /**
-     * Validates that a client secret is not null and contains does not contain the string {@code {clientSecret}}.
+     * Asserts that a client secret is not null and contains does not contain the string {@code {clientSecret}}.
+     *
      * @param clientSecret the Client Secret to be validated
+     * @throws IllegalArgumentException Thrown if URL is invalid
      */
     public static void assertClientSecret(String clientSecret) {
         validateClientSecret(clientSecret).ifInvalidThrow();
     }
 
+    /**
+     * Returns a {@link ValidationResponse} checking the {@code clientSecret} is not null and contains does not contain the string {@code {clientSecret}}.
+     *
+     * @param clientSecret the Client Secret to be validated
+     * @return a ValidationResponse containing the validation status and message (when invalid)
+     */
     public static ValidationResponse validateClientSecret(String clientSecret) {
         ValidationResponse response = new ValidationResponse();
         if (!hasText(clientSecret)) {
