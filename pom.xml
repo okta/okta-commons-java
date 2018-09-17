@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.okta</groupId>
         <artifactId>okta-parent</artifactId>
-        <version>6</version>
+        <version>7</version>
     </parent>
 
     <groupId>com.okta.commons</groupId>
