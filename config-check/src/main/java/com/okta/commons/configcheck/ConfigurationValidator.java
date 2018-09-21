@@ -15,6 +15,9 @@
  */
 package com.okta.commons.configcheck;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
@@ -29,6 +32,7 @@ import static java.util.Locale.ENGLISH;
  */
 public final class ConfigurationValidator {
 
+    private static final Logger logger = LoggerFactory.getLogger(ConfigurationValidator.class);
     private static final ResourceBundle ERRORS = ResourceBundle.getBundle("com/okta/commons/configcheck/ConfigurationValidator");
 
     private ConfigurationValidator() {}
@@ -50,6 +54,26 @@ public final class ConfigurationValidator {
         validateOrgUrl(url).ifInvalidThrow();
     }
 
+    /** Asserts the {@code url} is a well formed HTTPS URL and does not contain common typos.  The checks include:
+     * <ul>
+     *     <li>Contains {yourOktaDomain}</li>
+     *     <li>Hostname ends with .com.com</li>
+     *     <li>Contains -admin.okta.com</li>
+     *     <li>Contains -admin.oktapreview.com</li>
+     *     <li>Contains -admin.okta-emea.com</li>
+     * </ul>
+     *
+     * @param url The url to be validated
+     * @param allowNonHttpsForTesting Allow orgUrl to be non-https, likely used for testing.
+     * @throws IllegalArgumentException Thrown if URL is invalid
+     * @deprecated use {@link #validateOrgUrl(String)} instead, disabling this check is NOT recommended, and should
+     * ONLY be done in testing scenarios
+     */
+    @Deprecated
+    public static void assertOrgUrl(String url, boolean allowNonHttpsForTesting) {
+        validateOrgUrl(url, allowNonHttpsForTesting).ifInvalidThrow();
+    }
+
     /**
      * Returns a {@link ValidationResponse} checking to make sure the {@code url} is a well formed HTTPS URL and does
      * not contain common typos.  The checks include:
@@ -65,7 +89,29 @@ public final class ConfigurationValidator {
      * @return a ValidationResponse containing the validation status and message (when invalid)
      */
     public static ValidationResponse validateOrgUrl(String url) {
-        return validateHttpsUrl(url, "orgUrl");
+        return validateHttpsUrl(url, "orgUrl", false);
+    }
+
+    /**
+     * Returns a {@link ValidationResponse} checking to make sure the {@code url} is a well formed HTTPS URL and does
+     * not contain common typos.  The checks include:
+     * <ul>
+     *     <li>Contains {yourOktaDomain}</li>
+     *     <li>Hostname ends with .com.com</li>
+     *     <li>Contains -admin.okta.com</li>
+     *     <li>Contains -admin.oktapreview.com</li>
+     *     <li>Contains -admin.okta-emea.com</li>
+     * </ul>
+     *      *
+     * @param url The url to be validated
+     * @param allowNonHttpsForTesting Allow orgUrl to be non-https, likely used for testing.
+     * @return a ValidationResponse containing the validation status and message (when invalid)
+     * @deprecated use {@link #validateOrgUrl(String)} instead, disabling this check is NOT recommended, and should
+     * ONLY be done in testing scenarios
+     */
+    @Deprecated
+    public static ValidationResponse validateOrgUrl(String url, boolean allowNonHttpsForTesting) {
+        return validateHttpsUrl(url, "orgUrl", allowNonHttpsForTesting);
     }
 
     /**
@@ -128,7 +174,7 @@ public final class ConfigurationValidator {
      * @return a ValidationResponse containing the validation status and message (when invalid)
      */
     public static ValidationResponse validateIssuer(String url) {
-        return validateHttpsUrl(url, "issuerUrl");
+        return validateHttpsUrl(url, "issuerUrl", false);
     }
 
     /**
@@ -188,7 +234,7 @@ public final class ConfigurationValidator {
         return MessageFormat.format(message, args);
     }
 
-    private static ValidationResponse validateHttpsUrl(String url, String keyPrefix) {
+    private static ValidationResponse validateHttpsUrl(String url, String keyPrefix, boolean allowNonHttps) {
         ValidationResponse response = new ValidationResponse();
         if (!hasText(url)) {
             response.setMessage(ERRORS.getString(keyPrefix + ".missing"));
@@ -198,8 +244,12 @@ public final class ConfigurationValidator {
             try {
                 URL tempUrl = new URL(url);
                 String host = tempUrl.getHost().toLowerCase(ENGLISH);
-                if (!"https".equalsIgnoreCase(tempUrl.getProtocol())) {
-                    response.setMessage(formattedErrorMessage(keyPrefix + ".nonHttpsInvalid", url));
+                if (!"https".equalsIgnoreCase(tempUrl.getProtocol()) ){
+                    if (allowNonHttps) {
+                        logger.warn(ERRORS.getString("httpsCheck.disabled"));
+                    } else {
+                        response.setMessage(formattedErrorMessage(keyPrefix + ".nonHttpsInvalid", url));
+                    }
                 } else if (host.endsWith(".com.com")){
                     response.setMessage(formattedErrorMessage(keyPrefix + ".invalid", url));
                 } else if (host.endsWith("-admin.okta.com")
