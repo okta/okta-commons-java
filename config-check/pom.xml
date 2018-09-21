@@ -27,4 +27,17 @@
     <artifactId>okta-config-check</artifactId>
     <name>Okta Commons :: Config Check</name>
     <description>Provides utility classes to validate common configuration, base URLs, API token strings, etc.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

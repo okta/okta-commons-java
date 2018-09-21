@@ -15,6 +15,11 @@
  */
 package com.okta.commons.configcheck
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.read.ListAppender
+import org.slf4j.LoggerFactory
 import org.testng.Assert
 import org.testng.annotations.Test
 
@@ -22,6 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.allOf
+import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.containsString
 
 /**
@@ -33,6 +39,23 @@ class ConfigurationValidatorTest {
     void nullBaseUrl() {
         def e = expect {ConfigurationValidator.assertOrgUrl(null)}
         assertThat(e.message,containsString("Your Okta URL is missing"))
+    }
+
+    @Test
+    void httpBaseUrlNonHttps() {
+
+        def logger = (Logger) LoggerFactory.getLogger(ConfigurationValidator)
+        def logEvents = new ListAppender<ILoggingEvent>()
+        logEvents.start()
+        logger.addAppender(logEvents)
+
+        // no exception, when https checks are disabled, but a warning is logged
+        ConfigurationValidator.assertOrgUrl("http://okta.example.com", true)
+
+        // validate log event
+        def logEvent = logEvents.list.get(0)
+        assertThat(logEvent.level, is(Level.WARN))
+        assertThat(logEvent.message, containsString("HTTPS check is disabled"))
     }
 
     @Test
