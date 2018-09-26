@@ -25,7 +25,7 @@
 
     <groupId>com.okta.commons</groupId>
     <artifactId>okta-commons-root</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Okta Commons</name>
@@ -185,8 +185,4 @@
             </build>
         </profile>
     </profiles>
-
-  <scm>
-    <tag>okta-commons-root-1.0.0</tag>
-  </scm>
 </project>
