@@ -37,7 +37,27 @@ ${MVN_CMD} release:perform
 # the release plugin does not create signed tags, so update the existing tag
 git tag ${TAG_NAME} -f -s -m "${TAG_NAME}" ${TAG_NAME}
 
+# the release plugin uses this dir to cut the release
+# switch to the release dir/tag and publish the javadoc
+pushd target/checkout
+
+git clone -b gh-pages git@github.com:${REPO_SLUG}.git target/gh-pages
+
+# publish once to the versioned dir
+$MVN_CMD javadoc:aggregate jxr:aggregate -Ppub-docs -Djavadoc.version.dir=''
+# and again to the unversioned dir
+$MVN_CMD javadoc:aggregate com.okta:okta-doclist-maven-plugin:generate jxr:aggregate -Ppub-docs -Djavadoc.version.dir="${NEW_VERSION}/"
+
+cd target/gh-pages
+git add .
+git commit -m "deploying javadocs for v${NEW_VERSION}"
+git push origin gh-pages
+
+popd
+
+git push origin $(git rev-parse --abbrev-ref HEAD)
+git push origin ${TAG_NAME}
+
 echo
 echo "Tag '${TAG_NAME}' has been created"
-echo "To complete release run: ./src/ci/finalize-release.sh"
-
+echo "Manually update the release notes at https://github.com/okta/${REPO_SLUG}/releases/edit/${TAG_NAME}"
