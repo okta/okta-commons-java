@@ -55,8 +55,19 @@ git push origin gh-pages
 
 popd
 
-git push origin $(git rev-parse --abbrev-ref HEAD)
+# push signed tag
 git push origin ${TAG_NAME}
+
+BRANCH_TO_PUSH="$(git rev-parse --abbrev-ref HEAD)"
+echo "Attempting to push to '${BRANCH_TO_PUSH}', this may fail depending on GitHub access configuration"
+if git push origin "${BRANCH_TO_PUSH}"; then
+    echo "Push successful to ${BRANCH_TO_PUSH}"
+else
+    echo "Manual release, creating pull request"
+    PR_BRANCH="release-pr-${NEW_VERSION}"
+    git checkout -b "${PR_BRANCH}"
+    hub pull-request -m "Automated PR created while releasing v${NEW_VERSION}" -b "${BRANCH_TO_PUSH}"
+fi
 
 echo
 echo "Tag '${TAG_NAME}' has been created"
