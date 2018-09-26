@@ -66,6 +66,10 @@ else
     echo "Manual release, creating pull request"
     PR_BRANCH="release-pr-${NEW_VERSION}"
     git checkout -b "${PR_BRANCH}"
+    git push origin "${PR_BRANCH}"
+
+    echo
+    echo "Release PR created:"
     hub pull-request -m "Automated PR created while releasing v${NEW_VERSION}" -b "${BRANCH_TO_PUSH}"
 fi
 
