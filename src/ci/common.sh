@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2017-Present Okta, Inc
+# Copyright 2017-Present Okta, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 
+# ignore unused var in this script as this script defines common bits for our other scripts
+# shellcheck disable=SC2034
 
 # deploy snapshot from ONLY this branch
 SNAPSHOT_BRANCH="master"
