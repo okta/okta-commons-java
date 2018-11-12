@@ -25,7 +25,7 @@
 
     <groupId>com.okta.commons</groupId>
     <artifactId>okta-commons-root</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Okta Commons</name>
@@ -39,10 +39,24 @@
 
     <modules>
         <module>config-check</module>
+        <module>lang</module>
+        <module>coverage</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- child projects -->
+            <dependency>
+                <groupId>com.okta.commons</groupId>
+                <artifactId>okta-commons-lang</artifactId>
+                <version>1.1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.okta.commons</groupId>
+                <artifactId>okta-config-check</artifactId>
+                <version>1.1.0-SNAPSHOT</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.hamcrest</groupId>
@@ -143,6 +157,22 @@
                             <goal>report</goal>
                         </goals>
                         <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jasig.maven</groupId>
+                <artifactId>maven-notice-plugin</artifactId>
+                <inherited>false</inherited>
+                <configuration>
+                    <noticeTemplate>${root.dir}/src/license/NOTICE.template</noticeTemplate>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

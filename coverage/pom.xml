@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2018-Present Okta, Inc.
+  ~ Copyright 2017 Okta
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -24,20 +24,37 @@
         <version>1.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>okta-config-check</artifactId>
-    <name>Okta Commons :: Config Check</name>
-    <description>Provides utility classes to validate common configuration, base URLs, API token strings, etc.</description>
+    <artifactId>okta-commons-coverage</artifactId>
+    <name>Okta Commons :: Coverage</name>
+    <description>Project wide code coverage</description>
+    <packaging>pom</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>com.okta.commons</groupId>
+            <artifactId>okta-commons-lang</artifactId>
         </dependency>
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.2.2</version>
-            <scope>test</scope>
+            <groupId>com.okta.commons</groupId>
+            <artifactId>okta-config-check</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>jacoco-report</id>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

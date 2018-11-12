@@ -13,8 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 This project includes:
-  SLF4J API Module under MIT License
-
+#GENERATED_NOTICES#
 
 This project also includes modified code based on the following copyrights:
 - *Util classes and functions from the
