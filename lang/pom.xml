@@ -24,9 +24,9 @@
         <version>1.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>okta-config-check</artifactId>
-    <name>Okta Commons :: Config Check</name>
-    <description>Provides utility classes to validate common configuration, base URLs, API token strings, etc.</description>
+    <artifactId>okta-commons-lang</artifactId>
+    <name>Okta Commons :: Lang</name>
+    <description>Provides utility classes for common functionality (with no dependencies like Spring, Guava or Apache Commons.</description>
 
     <dependencies>
         <dependency>
