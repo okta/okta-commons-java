@@ -15,4 +15,8 @@
   -->
 <FindBugsFilter>
 
+    <!-- Copied from Spring -->
+    <Match><Class name="com.okta.commons.lang.Strings"/></Match>
+    <Match><Class name="com.okta.commons.lang.Objects"/></Match>
+
 </FindBugsFilter>
