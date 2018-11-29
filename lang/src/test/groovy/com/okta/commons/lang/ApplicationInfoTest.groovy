@@ -23,11 +23,11 @@ import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.is
 
-class SystemInfoTest {
+class ApplicationInfoTest {
 
     @Test
     void testVersionUtil() {
-        assertThat SystemInfo.getInfoMap(), allOf(
+        assertThat ApplicationInfo.get(), allOf(
                 hasEntry(is("okta-test-lib1"), is("1.2.3")),
                 hasEntry(is("okta-test-lib2"), is("v3.2.1")),
                 hasEntry(is("java"), is(System.getProperty("java.version"))),
@@ -38,13 +38,13 @@ class SystemInfoTest {
     @Test
     void quickTest() {
         // groovy will access private methods and fields
-        def envInfo = new SystemInfo()
+        def appInfo = new ApplicationInfo()
 
-        def info = envInfo.getFullEntryStringUsingManifest(Test.class.getName(), "testng")
+        def info = appInfo.getFullEntryStringUsingManifest(Test.class.getName(), "testng")
         assertThat info.name, is("testng")
         assertThat info.version, is("6.9.10") // tied to version in pom.xml
 
-        info = envInfo.getFullEntryStringUsingManifest(Mockito.class.getName(), "mockito")
+        info = appInfo.getFullEntryStringUsingManifest(Mockito.class.getName(), "mockito")
         assertThat info.name, is("mockito")
         assertThat info.version, is("unknown") // mockito sets "Implementation-Version" in the MANIFEST
     }
