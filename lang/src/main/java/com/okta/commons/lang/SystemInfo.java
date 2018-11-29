@@ -1,5 +1,6 @@
 /*
- * Copyright 2018-Present Okta, Inc.
+ * Copyright 2014 Stormpath, Inc.
+ * Modifications Copyright 2018 Okta, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.list;
 
-public final class EnvironmentInfo {
+public final class SystemInfo {
 
     // lookup okta libs by projects with a versions prop
     private static final String VERSION_FILE_LOCATION = "META-INF/okta/version.properties";
@@ -78,18 +79,18 @@ public final class EnvironmentInfo {
     private static final String WEB_SERVER_WILDFLY_CLASS = "org.jboss.as.security.ModuleName";
 
     private static final String UNKNOWN_VERSION = "unknown";
-    private static final Logger log = LoggerFactory.getLogger(EnvironmentInfo.class);
+    private static final Logger log = LoggerFactory.getLogger(SystemInfo.class);
 
     //Placeholder for the actual env info map
-    private static final Map<String, String> ENVIRONMENT_MAP = createEnvironmentNameVersionMap();
+    private static final Map<String, String> NAME_VERSION_MAP = createNameToVersionMap();
 
-    private EnvironmentInfo() {}
+    private SystemInfo() {}
 
-    public static Map<String, String> getEnvironmentInfo() {
-        return ENVIRONMENT_MAP;
+    public static Map<String, String> getInfoMap() {
+        return NAME_VERSION_MAP;
     }
 
-    private static Map<String, String> createEnvironmentNameVersionMap() {
+    private static Map<String, String> createNameToVersionMap() {
 
         List<NameAndVersion> nameAndVersions = new ArrayList<>(oktaComponentsFromVersionMetadata());
         nameAndVersions.add(getShiroInfo());                // shiro
@@ -310,8 +311,8 @@ public final class EnvironmentInfo {
     private static Set<NameAndVersion> oktaComponentsFromVersionMetadata() {
         Set<NameAndVersion> results = new HashSet<>();
         try {
-            list(EnvironmentInfo.class.getClassLoader().getResources(VERSION_FILE_LOCATION)).stream()
-                    .map(EnvironmentInfo::loadProps)
+            list(SystemInfo.class.getClassLoader().getResources(VERSION_FILE_LOCATION)).stream()
+                    .map(SystemInfo::loadProps)
                     .forEach(properties -> results.addAll(entriesFromOktaVersionMetadata(properties)));
         } catch (IOException e) { //NOPMD
             // don't fail when gathering info
