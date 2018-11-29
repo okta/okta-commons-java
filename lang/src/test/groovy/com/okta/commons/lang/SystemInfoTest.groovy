@@ -23,11 +23,11 @@ import static org.hamcrest.Matchers.allOf
 import static org.hamcrest.Matchers.hasEntry
 import static org.hamcrest.Matchers.is
 
-class EnvironmentInfoTest {
+class SystemInfoTest {
 
     @Test
     void testVersionUtil() {
-        assertThat EnvironmentInfo.getEnvironmentInfo(), allOf(
+        assertThat SystemInfo.getInfoMap(), allOf(
                 hasEntry(is("okta-test-lib1"), is("1.2.3")),
                 hasEntry(is("okta-test-lib2"), is("v3.2.1")),
                 hasEntry(is("java"), is(System.getProperty("java.version"))),
@@ -38,7 +38,7 @@ class EnvironmentInfoTest {
     @Test
     void quickTest() {
         // groovy will access private methods and fields
-        def envInfo = new EnvironmentInfo()
+        def envInfo = new SystemInfo()
 
         def info = envInfo.getFullEntryStringUsingManifest(Test.class.getName(), "testng")
         assertThat info.name, is("testng")
