@@ -25,7 +25,7 @@
 
     <groupId>com.okta.commons</groupId>
     <artifactId>okta-commons-root</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Okta Commons</name>
@@ -50,12 +50,12 @@
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-commons-lang</artifactId>
-                <version>1.1.0</version>
+                <version>1.1.1-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-config-check</artifactId>
-                <version>1.1.0</version>
+                <version>1.1.1-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -215,8 +215,4 @@
             </build>
         </profile>
     </profiles>
-
-  <scm>
-    <tag>okta-commons-root-1.1.0</tag>
-  </scm>
 </project>
