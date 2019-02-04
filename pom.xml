@@ -35,6 +35,7 @@
 
     <properties>
         <github.slug>okta/okta-commons-java</github.slug>
+        <okta.commons.previousVersion>1.1.0</okta.commons.previousVersion>
     </properties>
 
     <modules>
@@ -132,7 +133,7 @@
                             <dependency>
                                 <groupId>${project.groupId}</groupId>
                                 <artifactId>${project.artifactId}</artifactId>
-                                <version>${okta.project.pereviousVersion}</version>
+                                <version>${okta.commons.previousVersion}</version>
                                 <type>jar</type>
                             </dependency>
                         </oldVersion>
@@ -140,7 +141,6 @@
                             <onlyModified>true</onlyModified>
                             <breakBuildOnBinaryIncompatibleModifications>true</breakBuildOnBinaryIncompatibleModifications>
                             <breakBuildBasedOnSemanticVersioning>true</breakBuildBasedOnSemanticVersioning>
-                            <postAnalysisScript>${root.dir}/src/japicmp/postAnalysisScript.groovy</postAnalysisScript>
                         </parameter>
                     </configuration>
                 </plugin>
@@ -183,19 +183,18 @@
             <id>ci</id>
             <build>
                 <plugins>
-                    <!-- enable after first release -->
-                    <!--<plugin>-->
-                        <!--<groupId>com.github.siom79.japicmp</groupId>-->
-                        <!--<artifactId>japicmp-maven-plugin</artifactId>-->
-                        <!--<executions>-->
-                            <!--<execution>-->
-                                <!--<id>japicmp</id>-->
-                                <!--<goals>-->
-                                    <!--<goal>cmp</goal>-->
-                                <!--</goals>-->
-                            <!--</execution>-->
-                        <!--</executions>-->
-                    <!--</plugin>-->
+                    <plugin>
+                        <groupId>com.github.siom79.japicmp</groupId>
+                        <artifactId>japicmp-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>japicmp</id>
+                                <goals>
+                                    <goal>cmp</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
