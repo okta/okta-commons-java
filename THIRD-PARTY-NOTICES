@@ -13,6 +13,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 This project includes:
+  Apache Commons Codec under Apache License, Version 2.0
+  Apache HttpAsyncClient under Apache License, Version 2.0
+  Apache HttpClient under Apache License, Version 2.0
+  Apache HttpCore under Apache License, Version 2.0
+  Apache HttpCore NIO under Apache License, Version 2.0
+  JCL 1.2 implemented over SLF4J under MIT License
+  OkHttp under Apache 2.0
+  Okio under Apache 2.0
   SLF4J API Module under MIT License
 
 

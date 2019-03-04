@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2017-Present Okta
+  ~ Copyright 2018-Present Okta, Inc.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,55 +22,43 @@
         <groupId>com.okta.commons</groupId>
         <artifactId>okta-commons-root</artifactId>
         <version>1.1.2-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
     </parent>
 
-    <artifactId>okta-commons-coverage</artifactId>
-    <name>Okta Commons :: Coverage</name>
-    <description>Project wide code coverage</description>
-    <packaging>pom</packaging>
+    <artifactId>okta-http-impl</artifactId>
+    <name>Okta Commons :: HTTP impl</name>
+    <description>Provides generic wrapper classes for HTTP requests</description>
 
     <dependencies>
+
         <dependency>
             <groupId>com.okta.commons</groupId>
             <artifactId>okta-commons-lang</artifactId>
         </dependency>
         <dependency>
             <groupId>com.okta.commons</groupId>
-            <artifactId>okta-config-check</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.okta.commons</groupId>
             <artifactId>okta-http-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.okta.commons</groupId>
-            <artifactId>okta-http-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.okta.commons</groupId>
-            <artifactId>okta-http-httpclient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.okta.commons</groupId>
-            <artifactId>okta-http-okhttp</artifactId>
-        </dependency>
-    </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>jacoco-report</id>
-                        <goals>
-                            <goal>report-aggregate</goal>
-                        </goals>
-                        <phase>verify</phase>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.2</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!-- Test deps -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.24.0</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
 </project>

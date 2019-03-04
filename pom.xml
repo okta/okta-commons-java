@@ -41,6 +41,10 @@
     <modules>
         <module>config-check</module>
         <module>lang</module>
+        <module>http/http-api</module>
+        <module>http/http-impl</module>
+        <module>http/httpclient</module>
+        <module>http/okhttp</module>
         <module>coverage</module>
     </modules>
 
@@ -56,6 +60,26 @@
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-config-check</artifactId>
+                <version>1.1.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.okta.commons</groupId>
+                <artifactId>okta-http-api</artifactId>
+                <version>1.1.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.okta.commons</groupId>
+                <artifactId>okta-http-impl</artifactId>
+                <version>1.1.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.okta.commons</groupId>
+                <artifactId>okta-http-httpclient</artifactId>
+                <version>1.1.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.okta.commons</groupId>
+                <artifactId>okta-http-okhttp</artifactId>
                 <version>1.1.2-SNAPSHOT</version>
             </dependency>
 
