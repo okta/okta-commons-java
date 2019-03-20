@@ -31,6 +31,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.CookieJar;
 import okhttp3.Credentials;
+import okhttp3.Dispatcher;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
@@ -45,7 +46,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  */
@@ -75,6 +79,7 @@ public class OkHttpRequestExecutor implements RequestExecutor {
         clientBuilder.writeTimeout(clientConfiguration.getConnectionTimeout().getSeconds(), TimeUnit.SECONDS);
 
         clientBuilder.cookieJar(CookieJar.NO_COOKIES);
+//        clientBuilder.dispatcher(new Dispatcher(ForkJoinPool.commonPool()));
         clientBuilder.retryOnConnectionFailure(false); // handled by SDK
 
         final Proxy sdkProxy = clientConfiguration.getProxy();
@@ -95,58 +100,60 @@ public class OkHttpRequestExecutor implements RequestExecutor {
     }
 
     @Override
-    public CompletableFuture<Response> executeRequestAsync(Request request) throws RestException {
+    public CompletableFuture<Response> executeRequestAsync(Request request, ExecutorService executorService) throws RestException {
 
-        // Sign the request
-        this.requestAuthenticator.authenticate(request);
+        return CompletableFuture.supplyAsync(() -> {
 
-        HttpUrl.Builder urlBuilder = HttpUrl.get(request.getResourceUrl()).newBuilder();
+            // Sign the request
+            this.requestAuthenticator.authenticate(request);
 
-        // query parms
-        request.getQueryString().forEach(urlBuilder::addQueryParameter);
+            HttpUrl.Builder urlBuilder = HttpUrl.get(request.getResourceUrl()).newBuilder();
 
-        okhttp3.Request.Builder okRequestBuilder = new okhttp3.Request.Builder()
-                             .url(urlBuilder.build());
+            // query parms
+            request.getQueryString().forEach(urlBuilder::addQueryParameter);
 
-        // headers
-        request.getHeaders().toSingleValueMap().forEach(okRequestBuilder::addHeader);
+            okhttp3.Request.Builder okRequestBuilder = new okhttp3.Request.Builder()
+                                 .url(urlBuilder.build());
 
-        HttpMethod method = request.getMethod();
-        switch (method) {
-            case DELETE:
-                okRequestBuilder.delete();
-                break;
-            case GET:
-                okRequestBuilder.get();
-                break;
-            case HEAD:
-                okRequestBuilder.head();
-                break;
-            case POST:
-                okRequestBuilder.post(new InputStreamRequestBody(request.getBody(), request.getHeaders().getContentType()));
-                break;
-            case PUT:
-                // TODO support 100-continue ?
-                okRequestBuilder.put(new InputStreamRequestBody(request.getBody(), request.getHeaders().getContentType()));
-                break;
-            default:
-                throw new IllegalArgumentException("Unrecognized HttpMethod: " + method);
-        }
+            // headers
+            request.getHeaders().toSingleValueMap().forEach(okRequestBuilder::addHeader);
 
-        CompletableFuture<Response> completableFuture = new CompletableFuture<>();
-
-        client.newCall(okRequestBuilder.build()).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                completableFuture.completeExceptionally(new RestException(e.getMessage(), e));
+            HttpMethod method = request.getMethod();
+            switch (method) {
+                case DELETE:
+                    okRequestBuilder.delete();
+                    break;
+                case GET:
+                    okRequestBuilder.get();
+                    break;
+                case HEAD:
+                    okRequestBuilder.head();
+                    break;
+                case POST:
+                    okRequestBuilder.post(new InputStreamRequestBody(request.getBody(), request.getHeaders().getContentType()));
+                    break;
+                case PUT:
+                    // TODO support 100-continue ?
+                    okRequestBuilder.put(new InputStreamRequestBody(request.getBody(), request.getHeaders().getContentType()));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unrecognized HttpMethod: " + method);
             }
 
-            @Override
-            public void onResponse(Call call, okhttp3.Response okResponse) throws IOException {
-                completableFuture.complete(toSdkResponse(okResponse));
-            }
-        });
-        return completableFuture;
+            CompletableFuture<Response> completableFuture = new CompletableFuture<>();
+            client.newCall(okRequestBuilder.build()).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    completableFuture.completeExceptionally(new RestException(e.getMessage(), e));
+                }
+
+                @Override
+                public void onResponse(Call call, okhttp3.Response okResponse) throws IOException {
+                    completableFuture.complete(toSdkResponse(okResponse));
+                }
+            });
+            return completableFuture;
+        }, executorService).thenCompose(Function.identity());
     }
 
     private Response toSdkResponse(okhttp3.Response okResponse) throws IOException {

@@ -16,17 +16,25 @@
  */
 package com.okta.commons.http;
 
+import com.okta.commons.lang.Threads;
+
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * @since 0.5.0
  */
 public interface RequestExecutor {
 
-    CompletableFuture<Response> executeRequestAsync(Request request) throws RestException;
+    CompletableFuture<Response> executeRequestAsync(Request request, ExecutorService executorService) throws RestException;
+
+    default CompletableFuture<Response> executeRequestAsync(Request request) throws RestException {
+        return executeRequestAsync(request, ForkJoinPool.commonPool());
+    }
 
     default Response executeRequest(Request request) throws RestException {
-        return executeRequestAsync(request).join();
+        return executeRequestAsync(request, Threads.synchronousExecutorService()).join();
     }
 
 }

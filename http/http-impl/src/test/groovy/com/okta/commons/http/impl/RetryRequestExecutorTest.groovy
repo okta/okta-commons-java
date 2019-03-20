@@ -39,9 +39,11 @@ import org.testng.annotations.Test
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
+import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.*
 
 class RetryRequestExecutorTest {
@@ -76,7 +78,7 @@ class RetryRequestExecutorTest {
         def requestExecutor = createRequestExecutor()
         def future = new CompletableFuture<>()
         future.complete(httpResponse)
-        when(requestExecutor.delegate.executeRequestAsync(request)).thenReturn(future)
+        when(requestExecutor.delegate.executeRequestAsync(eq(request), any(ExecutorService))).thenReturn(future)
 
         def response = requestExecutor.executeRequestAsync(request).get()
         def responseBody = response.body.text
@@ -118,8 +120,8 @@ class RetryRequestExecutorTest {
         future1.complete(httpResponse1)
         def future2 = new CompletableFuture()
         future2.complete(httpResponse2)
-        when(requestExecutor.delegate.executeRequestAsync(request)).thenReturn(future1)
-                                                              .thenReturn(future2)
+        when(requestExecutor.delegate.executeRequestAsync(eq(request), any(ExecutorService))).thenReturn(future1)
+                                                                                             .thenReturn(future2)
 
         Response response = null
         def totalTime = time { response = requestExecutor.executeRequestAsync(request).get() }
@@ -164,7 +166,7 @@ class RetryRequestExecutorTest {
         def requestExecutor = createRequestExecutor(requestAuthenticator)
         def future = new CompletableFuture()
         future.complete(httpResponse)
-        when(requestExecutor.delegate.executeRequestAsync(request)).thenReturn(future)
+        when(requestExecutor.delegate.executeRequestAsync(eq(request), any(ExecutorService))).thenReturn(future)
 
         def totalTime = time {
             def response = requestExecutor.executeRequestAsync(request).get()
@@ -175,7 +177,7 @@ class RetryRequestExecutorTest {
         assertThat totalTime, lessThan(1000L)
     }
 
-        @Test
+    @Test
     void test429RetryHeadersWithDuplicateXRateLimitRest() {
 
         long currentTime = System.currentTimeMillis()

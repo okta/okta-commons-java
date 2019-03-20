@@ -57,6 +57,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Function;
 
 /**
  * {@code RequestExecutor} implementation that uses the
@@ -181,49 +183,52 @@ public class HttpClientRequestExecutor implements RequestExecutor {
     }
 
     @Override
-    public CompletableFuture<Response> executeRequestAsync(Request request) throws RestException {
+    public CompletableFuture<Response> executeRequestAsync(Request request, ExecutorService executorService) throws RestException {
 
         Assert.notNull(request, "Request argument cannot be null.");
 
-        // Sign the request
-        this.requestAuthenticator.authenticate(request);
+        return CompletableFuture.supplyAsync(() -> {
 
-        HttpRequestBase httpRequest = this.httpClientRequestFactory.createHttpClientRequest(request, null);
+            // Sign the request
+            this.requestAuthenticator.authenticate(request);
 
-        CompletableFuture<Response> completableFuture = new CompletableFuture<>();
+            HttpRequestBase httpRequest = this.httpClientRequestFactory.createHttpClientRequest(request, null);
 
-        httpClient.execute(httpRequest, new FutureCallback<HttpResponse>() {
-            @Override
-            public void completed(HttpResponse httpResponse) {
-                try {
-                    completableFuture.complete(toSdkResponse(httpResponse));
-                } catch (IOException e) {
-                    failed(e);
-                } finally {
-                    closeEntitySilently(httpResponse);
+            CompletableFuture<Response> completableFuture = new CompletableFuture<>();
+
+            httpClient.execute(httpRequest, new FutureCallback<HttpResponse>() {
+                @Override
+                public void completed(HttpResponse httpResponse) {
+                    try {
+                        completableFuture.complete(toSdkResponse(httpResponse));
+                    } catch (IOException e) {
+                        failed(e);
+                    } finally {
+                        closeEntitySilently(httpResponse);
+                    }
                 }
-            }
 
-            @Override
-            public void failed(Exception e) {
-                boolean retryable = e instanceof NoHttpResponseException || e instanceof ConnectTimeoutException;
-                completableFuture.completeExceptionally(new RestException("Unable to execute HTTP request: " + e.getMessage(), e, retryable));
-            }
-
-            @Override
-            public void cancelled() {
-                completableFuture.completeExceptionally(new InterruptedException("Http request was canceled"));
-            }
-
-            private void closeEntitySilently(HttpResponse httpResponse) {
-                try {
-                    httpResponse.getEntity().getContent().close();
-                } catch (Throwable ignored) { // NOPMD
+                @Override
+                public void failed(Exception e) {
+                    boolean retryable = e instanceof NoHttpResponseException || e instanceof ConnectTimeoutException;
+                    completableFuture.completeExceptionally(new RestException("Unable to execute HTTP request: " + e.getMessage(), e, retryable));
                 }
-            }
-        });
 
-        return completableFuture;
+                @Override
+                public void cancelled() {
+                    completableFuture.completeExceptionally(new InterruptedException("Http request was canceled"));
+                }
+
+                private void closeEntitySilently(HttpResponse httpResponse) {
+                    try {
+                        httpResponse.getEntity().getContent().close();
+                    } catch (Throwable ignored) { // NOPMD
+                    }
+                }
+            });
+
+            return completableFuture;
+        }, executorService).thenCompose(Function.identity());
     }
 
     protected byte[] toBytes(HttpEntity entity) throws IOException {

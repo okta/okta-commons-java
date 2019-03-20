@@ -24,15 +24,22 @@ import com.okta.commons.http.RestException;
 import com.okta.commons.lang.Assert;
 import com.okta.commons.lang.Collections;
 import com.okta.commons.lang.Strings;
+import com.okta.commons.lang.Threads;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import com.okta.commons.http.RequestExecutor;
 
@@ -66,83 +73,127 @@ public final class RetryRequestExecutor implements RequestExecutor {
     }
 
     @Override
-    public CompletableFuture<Response> executeRequestAsync(Request request) throws RestException {
+    public CompletableFuture<Response> executeRequestAsync(Request request, ExecutorService executorService) throws RestException {
 
         Assert.notNull(request, "Request argument cannot be null.");
 
-        return CompletableFuture.supplyAsync(() -> {
+        // Make a copy of the original request params and headers so that we can
+        // permute them in the loop and start over with the original every time.
+        final QueryString originalQuery = new QueryString();
+        originalQuery.putAll(request.getQueryString());
 
-            int retryCount = 0;
-            Response response = null;
-            String requestId = null;
-            Timer timer = new Timer();
+        final HttpHeaders originalHeaders = new HttpHeaders();
+        originalHeaders.putAll(request.getHeaders());
 
-            // Make a copy of the original request params and headers so that we can
-            // permute them in the loop and start over with the original every time.
-            QueryString originalQuery = new QueryString();
-            originalQuery.putAll(request.getQueryString());
+        final Timer timer = new Timer();
 
-            HttpHeaders originalHeaders = new HttpHeaders();
-            originalHeaders.putAll(request.getHeaders());
+        return executeAsyncRequest(request, originalHeaders, originalQuery, 0, null, timer, executorService);
 
-            while (true) {
-                try {
-                    if (retryCount > 0) {
-                        request.setQueryString(originalQuery);
-                        request.setHeaders(originalHeaders);
-
-                        // remember the request-id header if we need to retry
-                        if (requestId == null) {
-                            requestId = getRequestId(response);
-                        }
-
-                        InputStream content = request.getBody();
-                        if (content != null && content.markSupported()) {
-                            content.reset();
-                        }
-
-                        try {
-                            // if we cannot pause, then return the original response
-                            pauseBeforeRetry(retryCount, response, timer.split());
-                        } catch (RestException e) {
-                            if (log.isDebugEnabled()) {
-                                log.warn("Unable to pause for retry: {}", e.getMessage(), e);
-                            } else {
-                                log.warn("Unable to pause for retry: {}", e.getMessage());
-                            }
-
-                            return response;
-                        }
-                    }
-
-                    retryCount++;
-
-                    // include X-Okta headers when retrying
-                    setOktaHeaders(request, requestId, retryCount);
-
-                    response = delegate.executeRequestAsync(request).join();
-
-                    //allow the loop to continue to execute a retry request
-                    if (!shouldRetry(response, retryCount, timer.split())) {
-                        return response;
-                    }
-
-                } catch (SocketException | SocketTimeoutException e) { // known generic retryable exceptions
-                    if (!shouldRetry(retryCount, timer.split())) {
-                        throw new RestException("Unable to execute HTTP request: " + e.getMessage(), e);
-                    }
-                    log.debug("Retrying on {}: {}", e.getClass().getName(), e.getMessage());
-                } catch (RestException e) {
-                    // exceptions from delegate marked as retrHttpClientRequestExecutoryable
-                    if (!e.isRetryable() || !shouldRetry(retryCount, timer.split())) {
-                        throw e;
-                    }
-                } catch (Exception e) {
-                    throw new RestException("Unable to execute HTTP request: " + e.getMessage(), e);
-                }
-            }
-        });
     }
+
+    private CompletableFuture<Response> doRequest(final Request request,
+                                                  final Response previousResponse,
+                                                  final HttpHeaders originalHeaders,
+                                                  final QueryString originalQuery,
+                                                  int retryCount,
+                                                  String requestId,
+                                                  Timer timer,
+                                                  ExecutorService executorService) {
+        if (retryCount > 0) {
+            // only the first request gets the callers executor, after that we continue on that same thread for each retry
+            executorService = Threads.synchronousExecutorService();
+            request.setQueryString(originalQuery);
+            request.setHeaders(originalHeaders);
+
+            try {
+                InputStream content = request.getBody();
+                if (content != null && content.markSupported()) {
+                    content.reset();
+                }
+            } catch (IOException e) {
+                throw new RestException("Unable to execute HTTP request: " + e.getMessage(), e);
+            }
+
+            try {
+                // if we cannot pause, then return the original response
+                pauseBeforeRetry(retryCount, previousResponse, timer.split());
+            } catch (RestException e) {
+                if (log.isDebugEnabled()) {
+                    log.warn("Unable to pause for retry: {}", e.getMessage(), e);
+                } else {
+                    log.warn("Unable to pause for retry: {}", e.getMessage());
+                }
+
+                return CompletableFuture.completedFuture(previousResponse);
+            }
+        }
+
+        // include X-Okta headers when retrying
+        setOktaHeaders(request, requestId, retryCount);
+
+        return delegate.executeRequestAsync(request, executorService);
+    }
+
+    private CompletableFuture<Response> executeAsyncRequest(final Request request,
+                                                            final HttpHeaders originalHeaders,
+                                                            final QueryString originalQuery,
+                                                            final int retryCount,
+                                                            final String requestId,
+                                                            final Timer timer,
+                                                            final ExecutorService executorService) {
+
+        return doRequest(request, null, originalHeaders, originalQuery, retryCount, requestId, timer, executorService)
+            .thenApply(response -> {
+
+                if (shouldRetry(response, retryCount, timer.split())) {
+                    String reqId = (requestId != null) ? requestId : getRequestId(response);
+                    return doRequest(request, response, originalHeaders, originalQuery, retryCount+1, reqId, timer, executorService);
+                }
+                return CompletableFuture.completedFuture(response);
+            })
+            .exceptionally(t -> retry(t, t, request, originalHeaders, originalQuery, retryCount, requestId, timer, executorService))
+            .thenCompose(Function.identity());
+    }
+
+    private CompletableFuture<Response> retry(Throwable first,
+                                              Throwable last,
+                                              final Request request,
+                                              final HttpHeaders originalHeaders,
+                                              final QueryString originalQuery,
+                                              final int retryCount,
+                                              final String requestId,
+                                              final Timer timer,
+                                              final ExecutorService executorService) {
+
+        if (isRetryable(last, retryCount, timer)) {
+            return failedFuture(new RestException("Unable to execute HTTP request: " + first.getMessage(), first));
+        }
+
+        return executeAsyncRequest(request, originalHeaders, originalQuery, retryCount, requestId, timer, executorService)
+            .thenApply(CompletableFuture::completedFuture)
+            .exceptionally(t -> { first.addSuppressed(t); return retry(first, t, request, originalHeaders, originalQuery, retryCount+1, requestId, timer, executorService); })
+            .thenCompose(Function.identity());
+    }
+
+    private boolean isRetryable(Throwable e, int retryCount, Timer timer) {
+        if (e instanceof SocketException || e instanceof SocketTimeoutException) {
+            if (!shouldRetry(retryCount, timer.split())) {
+                return false;
+            }
+            log.debug("Retrying on {}: {}", e.getClass().getName(), e.getMessage());
+        } else if (e instanceof RestException) {
+            RestException restException = (RestException) e;
+            return restException.isRetryable() && shouldRetry(retryCount, timer.split());
+        }
+        return true;
+    }
+
+    private static <T> CompletableFuture<T> failedFuture(Throwable t) {
+        final CompletableFuture<T> cf = new CompletableFuture<>();
+        cf.completeExceptionally(t);
+        return cf;
+    }
+
 
     /**
      * Exponential sleep on failed request to avoid flooding a service with
@@ -278,8 +329,8 @@ public final class RetryRequestExecutor implements RequestExecutor {
         if (Strings.hasText(requestId)) {
             request.getHeaders().add("X-Okta-Retry-For", requestId);
         }
-        if (retryCount > 1) {
-            request.getHeaders().add("X-Okta-Retry-Count", Integer.toString(retryCount));
+        if (retryCount > 0) {
+            request.getHeaders().add("X-Okta-Retry-Count", Integer.toString(retryCount+1));
         }
     }
 
@@ -291,5 +342,4 @@ public final class RetryRequestExecutor implements RequestExecutor {
             return System.currentTimeMillis() - startTime;
         }
     }
-
 }
