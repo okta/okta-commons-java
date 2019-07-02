@@ -41,6 +41,9 @@
     <modules>
         <module>config-check</module>
         <module>lang</module>
+        <module>http/http-api</module>
+        <module>http/okhttp</module>
+        <module>http/httpclient</module>
         <module>coverage</module>
     </modules>
 
@@ -57,6 +60,29 @@
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-config-check</artifactId>
                 <version>1.1.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.okta.commons</groupId>
+                <artifactId>okta-http-api</artifactId>
+                <version>1.1.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.okta.commons</groupId>
+                <artifactId>okta-http-okhttp</artifactId>
+                <version>1.1.2-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.okta.commons</groupId>
+                <artifactId>okta-http-httpclient</artifactId>
+                <version>1.1.2-SNAPSHOT</version>
+            </dependency>
+
+            <dependency>
+                <!-- compile time annotation processor -->
+                <groupId>com.google.auto.service</groupId>
+                <artifactId>auto-service</artifactId>
+                <version>1.0-rc5</version>
+                <optional>true</optional>
             </dependency>
 
             <dependency>
