@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2017-Present Okta
+  ~ Copyright 2018-Present Okta, Inc.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@
         <groupId>com.okta.commons</groupId>
         <artifactId>okta-commons-root</artifactId>
         <version>1.1.2-SNAPSHOT</version>
+        <relativePath>../../</relativePath>
     </parent>
 
-    <artifactId>okta-commons-coverage</artifactId>
-    <name>Okta Commons :: Coverage</name>
-    <description>Project wide code coverage</description>
-    <packaging>pom</packaging>
+    <artifactId>okta-http-api</artifactId>
+    <name>Okta Commons :: HTTP :: API</name>
+    <description>Provides a common HTTP Interface for Okta's Java libraries</description>
 
     <dependencies>
         <dependency>
@@ -35,38 +35,42 @@
             <artifactId>okta-commons-lang</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.okta.commons</groupId>
-            <artifactId>okta-config-check</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- test libs -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.9.10</version>
         </dependency>
         <dependency>
-            <groupId>com.okta.commons</groupId>
-            <artifactId>okta-http-api</artifactId>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.23.4</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.okta.commons</groupId>
-            <artifactId>okta-http-okhttp</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.okta.commons</groupId>
-            <artifactId>okta-http-httpclient</artifactId>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>jacoco-report</id>
-                        <goals>
-                            <goal>report-aggregate</goal>
-                        </goals>
-                        <phase>verify</phase>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.github.siom79.japicmp</groupId>
+                    <artifactId>japicmp-maven-plugin</artifactId>
+                    <configuration>
+                        <!-- need to skip until after initial release -->
+                        <skip>true</skip>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 </project>
