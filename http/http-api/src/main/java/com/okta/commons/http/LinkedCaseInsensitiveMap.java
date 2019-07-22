@@ -46,7 +46,7 @@ class LinkedCaseInsensitiveMap<V> extends LinkedHashMap<String, V> {
     LinkedCaseInsensitiveMap(Locale locale) {
         super();
         this.caseInsensitiveKeys = new HashMap<>();
-        this.locale = (locale != null ? locale : Locale.getDefault());
+        this.locale = locale != null ? locale : Locale.getDefault();
     }
 
     /**
@@ -71,7 +71,7 @@ class LinkedCaseInsensitiveMap<V> extends LinkedHashMap<String, V> {
     public LinkedCaseInsensitiveMap(int initialCapacity, Locale locale) {
         super(initialCapacity);
         this.caseInsensitiveKeys = new HashMap<String, String>(initialCapacity);
-        this.locale = (locale != null ? locale : Locale.getDefault());
+        this.locale = locale != null ? locale : Locale.getDefault();
     }
 
 
