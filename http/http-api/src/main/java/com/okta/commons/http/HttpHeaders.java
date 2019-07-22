@@ -149,7 +149,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      */
     public List<MediaType> getAccept() {
         String value = getFirst(ACCEPT);
-        return (value != null ? MediaType.parseMediaTypes(value) : Collections.emptyList());
+        return value != null ? MediaType.parseMediaTypes(value) : Collections.emptyList();
     }
 
     /**
@@ -282,7 +282,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      */
     public long getContentLength() {
         String value = getFirst(CONTENT_LENGTH);
-        return (value != null ? Long.parseLong(value) : -1);
+        return value != null ? Long.parseLong(value) : -1;
     }
 
     /**
@@ -309,7 +309,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      */
     public MediaType getContentType() {
         String value = getFirst(CONTENT_TYPE);
-        return (value != null ? MediaType.parseMediaType(value) : null);
+        return value != null ? MediaType.parseMediaType(value) : null;
     }
 
     /**
@@ -474,7 +474,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      */
     public URI getLocation() {
         String value = getFirst(LOCATION);
-        return (value != null ? URI.create(value) : null);
+        return value != null ? URI.create(value) : null;
     }
 
     /**

@@ -29,6 +29,6 @@ public class OkHttpRequestExecutorFactory implements RequestExecutorFactory {
 
     @Override
     public RequestExecutor create(HttpClientConfiguration clientConfiguration) {
-        return new RetryRequestExecutor(clientConfiguration, new com.okta.commons.http.okhttp.OkHttpRequestExecutor(clientConfiguration));
+        return new RetryRequestExecutor(clientConfiguration, new OkHttpRequestExecutor(clientConfiguration));
     }
 }
