@@ -159,11 +159,7 @@ public class OkHttpRequestExecutor implements RequestExecutor {
         //ensure that the content has been fully acquired before closing the http stream
         if (body != null) {
             contentLength = body.contentLength();
-            byte[] bytes = body.bytes();
-
-            if(bytes != null) {
-                bodyInputStream = new ByteArrayInputStream(bytes);
-            }
+            bodyInputStream = new ByteArrayInputStream(body.bytes());
         } else {
             contentLength = 0; // force 0 content length when there is no body
         }
