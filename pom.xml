@@ -25,7 +25,7 @@
 
     <groupId>com.okta.commons</groupId>
     <artifactId>okta-commons-root</artifactId>
-    <version>1.2.1-SNAPSHOT</version>
+    <version>1.2.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Okta Commons</name>
@@ -54,27 +54,27 @@
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-commons-lang</artifactId>
-                <version>1.2.1-SNAPSHOT</version>
+                <version>1.2.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-config-check</artifactId>
-                <version>1.2.1-SNAPSHOT</version>
+                <version>1.2.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-http-api</artifactId>
-                <version>1.2.1-SNAPSHOT</version>
+                <version>1.2.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-http-okhttp</artifactId>
-                <version>1.2.1-SNAPSHOT</version>
+                <version>1.2.2-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-http-httpclient</artifactId>
-                <version>1.2.1-SNAPSHOT</version>
+                <version>1.2.2-SNAPSHOT</version>
             </dependency>
 
             <dependency>
