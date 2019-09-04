@@ -215,13 +215,17 @@ public final class ApplicationInfo {
      * WARNING: This method must never be invoked unless we already know that the class identified by the parameter {@code fqcn}
      * really exists in the classpath. For example, we first need to assure that {@code Classes.isAvailable(fqcn))} is <code>TRUE</code>
      */
-    private static String getVersionInfoInManifest(String fqcn){
+    private static String getVersionInfoInManifest(String fqcn) {
+        String version = null;
         //get class package
         Package thePackage = Classes.forName(fqcn).getPackage();
-        //examine the package object
-        String version = thePackage.getSpecificationVersion();
-        if (!Strings.hasText(version)) {
-            version = thePackage.getImplementationVersion();
+        // package could be null in some uberjars
+        if (thePackage != null) {
+            //examine the package object
+            version = thePackage.getSpecificationVersion();
+            if (!Strings.hasText(version)) {
+                version = thePackage.getImplementationVersion();
+            }
         }
         if(!Strings.hasText(version)) {
             version = UNKNOWN_VERSION;
