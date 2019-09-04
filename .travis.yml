@@ -1,7 +1,7 @@
 language: java
 
 jdk:
-- oraclejdk8
+- openjdk8
 - openjdk11
 
 addons:
@@ -20,7 +20,7 @@ script:
 - "./src/ci/build.sh"
 
 after_success:
-- bash <(curl -s https://codecov.io/bash) -f config-check/target/site/jacoco/jacoco.xml
+- bash <(curl -s https://codecov.io/bash) -f coverage/target/site/jacoco-aggregate/jacoco.xml
 
 deploy:
 - provider: pages
