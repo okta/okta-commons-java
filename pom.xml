@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.okta</groupId>
         <artifactId>okta-parent</artifactId>
-        <version>15</version>
+        <version>16</version>
     </parent>
 
     <groupId>com.okta.commons</groupId>
@@ -81,7 +81,7 @@
                 <!-- compile time annotation processor -->
                 <groupId>com.google.auto.service</groupId>
                 <artifactId>auto-service</artifactId>
-                <version>1.0-rc5</version>
+                <version>1.0-rc6</version>
                 <optional>true</optional>
             </dependency>
 
@@ -105,7 +105,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>2.28.2</version>
+                <version>3.1.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
