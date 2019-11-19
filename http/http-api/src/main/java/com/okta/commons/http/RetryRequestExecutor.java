@@ -52,7 +52,7 @@ public final class RetryRequestExecutor implements RequestExecutor {
             maxElapsedMillis = clientConfiguration.getRetryMaxElapsed() * 1000;
         }
 
-        if (clientConfiguration.getRetryMaxAttempts() > 0) {
+        if (clientConfiguration.getRetryMaxAttempts() >= 0) {
             maxRetries = clientConfiguration.getRetryMaxAttempts();
         }
     }
