@@ -33,7 +33,7 @@ import static java.util.Locale.ENGLISH;
 public final class ConfigurationValidator {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationValidator.class);
-    private static final ResourceBundle ERRORS = ResourceBundle.getBundle("com/okta/commons/configcheck/ConfigurationValidator");
+    private static final ResourceBundle ERRORS = ResourceBundle.getBundle("com/okta/commons/configcheck/configuration-validator");
 
     private ConfigurationValidator() {}
 
