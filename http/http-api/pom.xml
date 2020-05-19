@@ -29,6 +29,10 @@
     <name>Okta Commons :: HTTP :: API</name>
     <description>Provides a common HTTP Interface for Okta's Java libraries</description>
 
+    <properties>
+        <module.name>com.okta.commons.http</module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.okta.commons</groupId>

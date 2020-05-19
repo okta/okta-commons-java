@@ -28,6 +28,10 @@
     <name>Okta Commons :: Config Check</name>
     <description>Provides utility classes to validate common configuration, base URLs, API token strings, etc.</description>
 
+    <properties>
+        <module.name>com.okta.commons.configcheck</module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.slf4j</groupId>

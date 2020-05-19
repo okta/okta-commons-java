@@ -29,6 +29,7 @@
     <description>Provides utility classes for common functionality (with no dependencies like Spring, Guava or Apache Commons.</description>
 
     <properties>
+        <module.name>com.okta.commons.lang</module.name>
         <powermock.version>2.0.2</powermock.version>
     </properties>
 
