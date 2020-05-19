@@ -35,6 +35,10 @@
     </description>
     <packaging>jar</packaging>
 
+    <properties>
+        <module.name>com.okta.commons.http.okhttp</module.name>
+    </properties>
+
     <dependencies>
 
         <dependency>

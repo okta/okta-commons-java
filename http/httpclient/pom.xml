@@ -34,6 +34,11 @@
         any time without warning - use it with runtime scope only.
     </description>
     <packaging>jar</packaging>
+
+    <properties>
+        <module.name>com.okta.commons.http.httpclient</module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.okta.commons</groupId>
