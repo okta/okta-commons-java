@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -80,10 +81,10 @@ public final class RequestUtils {
      * Convert string representation of supplied Date object (e.g. Thu Nov 30 13:15:16 PST 2017)
      * into ISO formatted date (e.g. 2017-11-30T21:15:16Z) that Okta core supports.
      *
-     * @param inDate string
+     * @param inDate
      * @return formatted string
      */
-    public static String getFormattedDate(String inDate) {
+    public static String getFormattedDate(Date inDate) {
         return String.valueOf(ZonedDateTime.parse(String.valueOf(inDate), DATE_TIME_FORMATTER)
             .withZoneSameInstant(ZoneId.of("Z")));
     }

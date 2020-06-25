@@ -44,7 +44,7 @@ public class QueryString extends TreeMap<String,String> {
                 String sValue = null;
                 if (value != null) {
                     if (value instanceof Date) {
-                        sValue = RequestUtils.getFormattedDate(String.valueOf(value));
+                        sValue = RequestUtils.getFormattedDate((Date) value);
                     } else {
                         sValue = String.valueOf(value);
                     }
@@ -57,7 +57,7 @@ public class QueryString extends TreeMap<String,String> {
     public String put(String key, Object value) {
         if (value != null) {
             if (value instanceof Date) {
-                return RequestUtils.getFormattedDate(String.valueOf(value));
+                return RequestUtils.getFormattedDate((Date) value);
             }
             return super.put(key, value.toString());
         }
