@@ -19,8 +19,7 @@ package com.okta.commons.http;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
@@ -31,7 +30,7 @@ import java.util.Locale;
 public final class RequestUtils {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER =
-        DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss zzz yyyy", Locale.US);
+        DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC);
 
     private RequestUtils() {}
 
@@ -85,8 +84,7 @@ public final class RequestUtils {
      * @return formatted string
      */
     public static String getFormattedDate(Date inDate) {
-        return String.valueOf(ZonedDateTime.parse(String.valueOf(inDate), DATE_TIME_FORMATTER)
-            .withZoneSameInstant(ZoneId.of("Z")));
+        return DATE_TIME_FORMATTER.format(inDate.toInstant());
     }
 
 }

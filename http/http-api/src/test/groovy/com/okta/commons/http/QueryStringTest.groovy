@@ -97,6 +97,5 @@ class QueryStringTest {
         def query = [since:sinceDate]
         def qs = new QueryString(query)
         assertEquals qs.toString(), "since=2017-11-30T21%3A15%3A16Z"
-        assertEquals qs.toString(), "since=" + URLEncoder.encode("2017-11-30T21:15:16Z", "UTF-8")
     }
 }
