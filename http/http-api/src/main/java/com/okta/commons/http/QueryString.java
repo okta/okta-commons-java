@@ -48,11 +48,13 @@ public class QueryString extends TreeMap<String,String> {
             for (Map.Entry<String,?> entry : source.entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue();
-                String sValue;
-                if (value instanceof Date) {
-                    sValue = RequestUtils.getFormattedDate(String.valueOf(value));
-                } else {
-                    sValue = value != null ? String.valueOf(value) : null;
+                String sValue = null;
+                if (value != null) {
+                    if (value instanceof Date) {
+                        sValue = RequestUtils.getFormattedDate(String.valueOf(value));
+                    } else {
+                        sValue = String.valueOf(value);
+                    }
                 }
                 put(key, sValue);
             }
