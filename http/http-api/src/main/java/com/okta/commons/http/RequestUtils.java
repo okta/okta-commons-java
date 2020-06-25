@@ -77,11 +77,11 @@ public final class RequestUtils {
     }
 
     /**
-     * Convert string representation of supplied Date object (e.g. Thu Nov 30 13:15:16 PST 2017)
-     * into ISO formatted date (e.g. 2017-11-30T21:15:16Z) that Okta core supports.
+     * Convert supplied Date object into ISO 8601 formatted
+     * date string (e.g. 2017-11-30T21:15:16Z) that Okta core supports.
      *
      * @param inDate
-     * @return formatted string
+     * @return ISO formatted string
      */
     public static String getFormattedDate(Date inDate) {
         return DATE_TIME_FORMATTER.format(inDate.toInstant());
