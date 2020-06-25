@@ -21,7 +21,15 @@ import com.okta.commons.lang.Strings;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /**
@@ -35,11 +43,17 @@ public class QueryString extends TreeMap<String,String> {
 
     public QueryString(Map<String,?> source) {
         super();
+
         if (!Collections.isEmpty(source)) {
-            for(Map.Entry<String,?> entry : source.entrySet()) {
+            for (Map.Entry<String,?> entry : source.entrySet()) {
                 String key = entry.getKey();
                 Object value = entry.getValue();
-                String sValue = value != null ? String.valueOf(value) : null;
+                String sValue;
+                if (value instanceof Date) {
+                    sValue = RequestUtils.getFormattedDate(String.valueOf(value));
+                } else {
+                    sValue = value != null ? String.valueOf(value) : null;
+                }
                 put(key, sValue);
             }
         }
@@ -47,6 +61,9 @@ public class QueryString extends TreeMap<String,String> {
 
     public String put(String key, Object value) {
         if (value != null) {
+            if (value instanceof Date) {
+                return RequestUtils.getFormattedDate(String.valueOf(value));
+            }
             return super.put(key, value.toString());
         }
         return null;

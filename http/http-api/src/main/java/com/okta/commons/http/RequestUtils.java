@@ -19,12 +19,18 @@ package com.okta.commons.http;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
  * @since 0.5.0
  */
 public final class RequestUtils {
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+        DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss zzz yyyy", Locale.US);
 
     private RequestUtils() {}
 
@@ -69,4 +75,17 @@ public final class RequestUtils {
 
         return encoded;
     }
+
+    /**
+     * Convert string representation of supplied Date object (e.g. Thu Nov 30 13:15:16 PST 2017)
+     * into ISO formatted date (e.g. 2017-11-30T21:15:16Z) that Okta core supports.
+     *
+     * @param inDate string
+     * @return formatted string
+     */
+    public static String getFormattedDate(String inDate) {
+        return String.valueOf(ZonedDateTime.parse(String.valueOf(inDate), DATE_TIME_FORMATTER)
+            .withZoneSameInstant(ZoneId.of("Z")));
+    }
+
 }
