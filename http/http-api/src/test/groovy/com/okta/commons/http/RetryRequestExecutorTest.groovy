@@ -279,6 +279,26 @@ class RetryRequestExecutorTest {
         expect HttpException, {requestExecutor.executeRequest(request)}
     }
 
+    @Test
+    void constructorMaxAttemptsZero() {
+        def delegateRequestExecutor = mock(RequestExecutor)
+        def clientConfiguration = createClientConfiguration(mock(RequestAuthenticator), 1, 0)
+        def retryRequestExecutor = new RetryRequestExecutor(clientConfiguration, delegateRequestExecutor)
+
+        assertThat retryRequestExecutor.maxRetries, comparesEqualTo(0)
+        assertThat retryRequestExecutor.maxElapsedMillis, comparesEqualTo(1000)
+    }
+
+    @Test
+    void constructorMaxElapsedZero() {
+        def delegateRequestExecutor = mock(RequestExecutor)
+        def clientConfiguration = createClientConfiguration(mock(RequestAuthenticator), 0, 1)
+        def retryRequestExecutor = new RetryRequestExecutor(clientConfiguration, delegateRequestExecutor)
+
+        assertThat retryRequestExecutor.maxRetries, comparesEqualTo(1)
+        assertThat retryRequestExecutor.maxElapsedMillis, comparesEqualTo(0)
+    }
+
     private static long time(Closure closure) {
         def startTime = System.currentTimeMillis()
         closure.call()
