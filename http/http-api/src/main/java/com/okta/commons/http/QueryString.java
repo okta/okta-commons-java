@@ -39,29 +39,27 @@ public class QueryString extends TreeMap<String,String> {
 
         if (!Collections.isEmpty(source)) {
             for (Map.Entry<String,?> entry : source.entrySet()) {
-                String key = entry.getKey();
-                Object value = entry.getValue();
-                String sValue = null;
-                if (value != null) {
-                    if (value instanceof Date) {
-                        sValue = RequestUtils.getFormattedDate((Date) value);
-                    } else {
-                        sValue = String.valueOf(value);
-                    }
-                }
-                put(key, sValue);
+                put(entry.getKey(), getFormattedValue(entry.getValue()));
             }
         }
     }
 
     public String put(String key, Object value) {
+        return super.put(key, getFormattedValue(value));
+    }
+
+    private String getFormattedValue(Object value) {
+        String result = null;
+
         if (value != null) {
             if (value instanceof Date) {
-                return RequestUtils.getFormattedDate((Date) value);
+                result = RequestUtils.getFormattedDate((Date) value);
+            } else {
+                result = String.valueOf(value);
             }
-            return super.put(key, value.toString());
         }
-        return null;
+
+        return result;
     }
 
     public String toString() {
