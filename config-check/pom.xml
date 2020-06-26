@@ -21,12 +21,16 @@
     <parent>
         <groupId>com.okta.commons</groupId>
         <artifactId>okta-commons-root</artifactId>
-        <version>1.2.3-SNAPSHOT</version>
+        <version>1.2.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>okta-config-check</artifactId>
     <name>Okta Commons :: Config Check</name>
     <description>Provides utility classes to validate common configuration, base URLs, API token strings, etc.</description>
+
+    <properties>
+        <module.name>com.okta.commons.configcheck</module.name>
+    </properties>
 
     <dependencies>
         <dependency>

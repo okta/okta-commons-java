@@ -90,4 +90,12 @@ class QueryStringTest {
         def qs = new QueryString(query)
         assertEquals qs.toString(), "key1=value1&key2=value2"
     }
+
+    @Test
+    void testWithDateObjectAsValue() {
+        Date sinceDate = new Date("Thu Nov 30 13:15:16 PST 2017")
+        def query = [since:sinceDate]
+        def qs = new QueryString(query)
+        assertEquals qs.toString(), "since=2017-11-30T21%3A15%3A16Z"
+    }
 }
