@@ -229,7 +229,8 @@ public final class RetryRequestExecutor implements RequestExecutor {
 
     private long getDefaultDelayMillis(int retries) {
         long scaleFactor = 300;
-        long result = (long) (Math.pow(2, retries) * scaleFactor);long millis = Math.min(result, DEFAULT_MAX_BACKOFF_IN_MILLISECONDS);
+        long result = (long) (Math.pow(2, retries) * scaleFactor);
+        long millis = Math.min(result, DEFAULT_MAX_BACKOFF_IN_MILLISECONDS);
         log.debug("getDefaultDelayMillis: [{}]", millis);
         return millis;
     }
