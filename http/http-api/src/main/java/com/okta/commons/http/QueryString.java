@@ -45,7 +45,10 @@ public class QueryString extends TreeMap<String,String> {
     }
 
     public String put(String key, Object value) {
-        return super.put(key, getFormattedValue(value));
+        if (value != null) {
+            return super.put(key, getFormattedValue(value));
+        }
+        return null;
     }
 
     private String getFormattedValue(Object value) {
