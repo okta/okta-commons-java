@@ -19,12 +19,18 @@ package com.okta.commons.http;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Locale;
 
 /**
  * @since 0.5.0
  */
 public final class RequestUtils {
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+        DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC);
 
     private RequestUtils() {}
 
@@ -69,4 +75,16 @@ public final class RequestUtils {
 
         return encoded;
     }
+
+    /**
+     * Convert supplied Date object into ISO 8601 formatted
+     * date string (e.g. 2017-11-30T21:15:16Z) that Okta core supports.
+     *
+     * @param inDate
+     * @return ISO formatted string
+     */
+    public static String getFormattedDate(Date inDate) {
+        return DATE_TIME_FORMATTER.format(inDate.toInstant());
+    }
+
 }
