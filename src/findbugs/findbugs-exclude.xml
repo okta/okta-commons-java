@@ -22,4 +22,10 @@
     <Match><Class name="com.okta.commons.http.MimeType"/></Match>
     <Match><Class name="~com\.okta\.commons\.http\.Mime.*"/></Match>
 
+    <Match>
+        <!-- This class finds files based on the XDG Base Dir spec, it should NOT be used with user input -->
+        <Class name="com.okta.commons.lang.XdgConfig"/>
+        <Bug pattern="PATH_TRAVERSAL_IN"/>
+    </Match>
+
 </FindBugsFilter>
