@@ -78,6 +78,11 @@ public final class ApplicationInfo {
     private static final String WEB_SERVER_WILDFLY_ID = "wildfly";
     private static final String WEB_SERVER_WILDFLY_CLASS = "org.jboss.as.security.ModuleName";
 
+    // Android
+    private static final String ANDROID_CLASS = "android.os.Build$VERSION";
+    private static final String ANDROID_VERSION_FIELD_NAME= "SDK_INT";
+    private static final String ANDROID_ID = "android";
+
     private static final String UNKNOWN_VERSION = "unknown";
     private static final Logger log = LoggerFactory.getLogger(ApplicationInfo.class);
 
@@ -100,6 +105,7 @@ public final class ApplicationInfo {
         nameAndVersions.add(getWebServerInfo());            // tomcat | jetty | jboss | websphere | glassfish | weblogic | wildfly
         nameAndVersions.add(getJavaSDKRuntimeInfo());       // java
         nameAndVersions.add(getOSInfo());                   // Mac OS X
+        nameAndVersions.add(getAndroidInfo());              // android
         return nameAndVersions.stream()
                 .filter(Objects::nonNull)
                 .collect(LinkedHashMap::new, // keep order
@@ -207,6 +213,20 @@ public final class ApplicationInfo {
             throw e;
         } catch (Exception e){ //NOPMD
             //there was a problem obtaining the WildFly version
+        }
+        return null;
+    }
+
+    private static NameAndVersion getAndroidInfo() {
+        try {
+            if (Classes.isAvailable(ANDROID_CLASS)) {
+                int version = Class.forName(ANDROID_CLASS).getField(ANDROID_VERSION_FIELD_NAME).getInt(null);
+                return new NameAndVersion(ANDROID_ID, Integer.toString(version));
+            }
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            // There was a problem obtaining the Android version.
         }
         return null;
     }
