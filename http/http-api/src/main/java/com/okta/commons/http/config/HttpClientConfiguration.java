@@ -17,6 +17,9 @@
 package com.okta.commons.http.config;
 
 import com.okta.commons.http.authc.RequestAuthenticator;
+import com.okta.commons.lang.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -36,6 +39,85 @@ public class HttpClientConfiguration {
     private Proxy proxy;
     private int retryMaxElapsed = 0;
     private int retryMaxAttempts = 0;
+
+    private Integer maxConnectionPerRoute;
+    private Integer maxConnectionTotal;
+    private Integer connectionValidationInactivity;
+    private Integer connectionTimeToLive;
+
+    private static final Logger log = LoggerFactory.getLogger(HttpClientConfiguration.class);
+
+    private static final String MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxPerRoute";
+    private static final int MAX_CONNECTIONS_PER_ROUTE_DEFAULT_VALUE = Integer.MAX_VALUE/2;
+    private static final String MAX_CONNECTIONS_PER_ROUTE_WARNING_MESSAGE = "Bad max connection per route value";
+
+    private static final String MAX_CONNECTIONS_TOTAL_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxTotal";
+    private static final int MAX_CONNECTIONS_TOTAL_DEFAULT_VALUE = Integer.MAX_VALUE;
+    private static final String MAX_CONNECTIONS_TOTAL_WARNING_MESSAGE = "Bad max connection total value";
+
+    private static final String CONNECTION_VALIDATION_INACTIVITY_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity";
+    private static final int CONNECTION_VALIDATION_INACTIVITY_DEFAULT_VALUE = 2000; // 2sec
+    private static final String CONNECTION_VALIDATION_INACTIVITY_WARNING_MESSAGE = "Invalid max connection inactivity validation value";
+
+    private static final String CONNECTION_TIME_TO_LIVE_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive";
+    private static final int CONNECTION_TIME_TO_LIVE_DEFAULT_VALUE = 5 * 1000 * 60; // 5 minutes
+    private static final String CONNECTION_TIME_TO_LIVE_WARNING_MESSAGE = "Invalid connection time to live value";
+
+    public String getMaxConnectionsTotalPropertyKey() {
+        return MAX_CONNECTIONS_TOTAL_PROPERTY_KEY;
+    }
+
+    public String getMaxConnectionsPerRoutePropertyKey() {
+        return MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY;
+    }
+
+    public Integer getMaxConnectionPerRouteDefault() {
+        return MAX_CONNECTIONS_PER_ROUTE_DEFAULT_VALUE;
+    }
+
+    public Integer getMaxConnectionTotalDefault() {
+        return MAX_CONNECTIONS_TOTAL_DEFAULT_VALUE;
+    }
+
+    public Integer getMaxConnectionPerRoute() {
+        if(this.maxConnectionPerRoute == null) {
+            this.maxConnectionPerRoute = parseConfigValue(
+                MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY,
+                MAX_CONNECTIONS_PER_ROUTE_DEFAULT_VALUE,
+                MAX_CONNECTIONS_PER_ROUTE_WARNING_MESSAGE);
+        }
+        return this.maxConnectionPerRoute;
+    }
+
+    public Integer getMaxConnectionTotal() {
+        if(this.maxConnectionTotal == null) {
+            this.maxConnectionTotal = parseConfigValue(
+                MAX_CONNECTIONS_TOTAL_PROPERTY_KEY,
+                MAX_CONNECTIONS_TOTAL_DEFAULT_VALUE,
+                MAX_CONNECTIONS_TOTAL_WARNING_MESSAGE);
+        }
+        return this.maxConnectionTotal;
+    }
+
+    public Integer getConnectionValidationInactivity() {
+        if(this.connectionValidationInactivity == null) {
+            this.connectionValidationInactivity = parseConfigValue(
+                CONNECTION_VALIDATION_INACTIVITY_PROPERTY_KEY,
+                CONNECTION_VALIDATION_INACTIVITY_DEFAULT_VALUE,
+                CONNECTION_VALIDATION_INACTIVITY_WARNING_MESSAGE);
+        }
+        return this.connectionValidationInactivity;
+    }
+
+    public int getConnectionTimeToLive() {
+        if(this.connectionTimeToLive == null) {
+            this.connectionTimeToLive = parseConfigValue(
+                CONNECTION_TIME_TO_LIVE_PROPERTY_KEY,
+                CONNECTION_TIME_TO_LIVE_DEFAULT_VALUE,
+                CONNECTION_TIME_TO_LIVE_WARNING_MESSAGE);
+        }
+        return this.connectionTimeToLive;
+    }
 
     public RequestAuthenticator getRequestAuthenticator() {
         return requestAuthenticator;
@@ -139,6 +221,20 @@ public class HttpClientConfiguration {
     public HttpClientConfiguration setRetryMaxAttempts(int retryMaxAttempts) {
         this.retryMaxAttempts = retryMaxAttempts;
         return this;
+    }
+
+    private int parseConfigValue(String key, int defaultValue, String warning) {
+
+        int configuredValue = defaultValue;
+        String configuredValueString = System.getProperty(key);
+        if (configuredValueString != null) {
+            try {
+                configuredValue = Integer.parseInt(configuredValueString);
+            } catch (NumberFormatException nfe) {
+                log.warn("{}: {}. Using default: {}.", warning, configuredValueString, defaultValue, nfe);
+            }
+        }
+        return configuredValue;
     }
 
     @Override

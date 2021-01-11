@@ -70,30 +70,6 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(HttpClientRequestExecutor.class);
 
-    private static final int DEFAULT_MAX_CONNECTIONS_PER_ROUTE = Integer.MAX_VALUE/2;
-    private static final String MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxPerRoute";
-    private static final int MAX_CONNECTIONS_PER_ROUTE = parseConfigValue(MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY,
-                                                                          DEFAULT_MAX_CONNECTIONS_PER_ROUTE,
-                                                                         "Bad max connection per route value");
-
-    private static final int DEFAULT_MAX_CONNECTIONS_TOTAL = Integer.MAX_VALUE;
-    private static final String MAX_CONNECTIONS_TOTAL_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxTotal";
-    private static final int MAX_CONNECTIONS_TOTAL = parseConfigValue(MAX_CONNECTIONS_TOTAL_PROPERTY_KEY,
-                                                                      DEFAULT_MAX_CONNECTIONS_TOTAL,
-                                                              "Bad max connection total value");
-
-    private static final int DEFAULT_CONNECTION_VALIDATION_INACTIVITY = 2000; // 2sec
-    private static final String CONNECTION_VALIDATION_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity";
-    private static final int CONNECTION_VALIDATION_INACTIVITY = parseConfigValue(CONNECTION_VALIDATION_PROPERTY_KEY,
-                                                                                 DEFAULT_CONNECTION_VALIDATION_INACTIVITY,
-                                                                                "Invalid max connection inactivity validation value");
-
-    private static final int DEFAULT_CONNECTION_TIME_TO_LIVE = 5 * 1000 * 60; // 5 minutes
-    private static final String CONNECTION_TIME_TO_LIVE_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive";
-    private static final int CONNECTION_TIME_TO_LIVE = parseConfigValue(CONNECTION_TIME_TO_LIVE_PROPERTY_KEY,
-                                                                        DEFAULT_CONNECTION_TIME_TO_LIVE,
-                                                                        "Invalid connection time to live value");
-
     private final RequestAuthenticator requestAuthenticator;
 
     private HttpClient httpClient;
@@ -110,22 +86,25 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
         this.requestAuthenticator = clientConfiguration.getRequestAuthenticator();
 
-        PoolingHttpClientConnectionManager connMgr = new PoolingHttpClientConnectionManager(CONNECTION_TIME_TO_LIVE, TimeUnit.MILLISECONDS);
-        connMgr.setValidateAfterInactivity(CONNECTION_VALIDATION_INACTIVITY);
+        PoolingHttpClientConnectionManager connMgr = new PoolingHttpClientConnectionManager(clientConfiguration.getConnectionTimeToLive(), TimeUnit.MILLISECONDS);
+        connMgr.setValidateAfterInactivity(clientConfiguration.getConnectionValidationInactivity());
 
-        if (MAX_CONNECTIONS_TOTAL >= MAX_CONNECTIONS_PER_ROUTE) {
-            connMgr.setDefaultMaxPerRoute(MAX_CONNECTIONS_PER_ROUTE);
-            connMgr.setMaxTotal(MAX_CONNECTIONS_TOTAL);
+        if (clientConfiguration.getMaxConnectionTotal() >= clientConfiguration.getMaxConnectionPerRoute()) {
+            connMgr.setDefaultMaxPerRoute(clientConfiguration.getMaxConnectionPerRoute());
+            connMgr.setMaxTotal(clientConfiguration.getMaxConnectionTotal());
         } else {
-            connMgr.setDefaultMaxPerRoute(DEFAULT_MAX_CONNECTIONS_PER_ROUTE);
-            connMgr.setMaxTotal(DEFAULT_MAX_CONNECTIONS_TOTAL);
+            connMgr.setDefaultMaxPerRoute(clientConfiguration.getMaxConnectionPerRouteDefault());
+            connMgr.setMaxTotal(clientConfiguration.getMaxConnectionTotalDefault());
 
             log.warn(
                 "{} ({}) is less than {} ({}). " +
                 "Reverting to defaults: connectionMaxTotal ({}) and connectionMaxPerRoute ({}).",
-                MAX_CONNECTIONS_TOTAL_PROPERTY_KEY, MAX_CONNECTIONS_TOTAL,
-                MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY, MAX_CONNECTIONS_PER_ROUTE,
-                DEFAULT_MAX_CONNECTIONS_TOTAL, DEFAULT_MAX_CONNECTIONS_PER_ROUTE
+                clientConfiguration.getMaxConnectionsPerRoutePropertyKey(),
+                clientConfiguration.getMaxConnectionTotal(),
+                clientConfiguration.getMaxConnectionsTotalPropertyKey(),
+                clientConfiguration.getMaxConnectionPerRoute(),
+                clientConfiguration.getMaxConnectionTotalDefault(),
+                clientConfiguration.getMaxConnectionPerRouteDefault()
             );
         }
 
@@ -261,19 +240,5 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         }
 
         return headers;
-    }
-
-    private static int parseConfigValue(String key, int defaultValue, String warning) {
-
-        int configuredValue = defaultValue;
-        String configuredValueString = System.getProperty(key);
-        if (configuredValueString != null) {
-            try {
-                configuredValue = Integer.parseInt(configuredValueString);
-            } catch (NumberFormatException nfe) {
-                log.warn("{}: {}. Using default: {}.", warning, configuredValueString, defaultValue, nfe);
-            }
-        }
-        return configuredValue;
     }
 }
