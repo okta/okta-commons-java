@@ -17,7 +17,6 @@
 package com.okta.commons.http.config;
 
 import com.okta.commons.http.authc.RequestAuthenticator;
-import com.okta.commons.lang.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
