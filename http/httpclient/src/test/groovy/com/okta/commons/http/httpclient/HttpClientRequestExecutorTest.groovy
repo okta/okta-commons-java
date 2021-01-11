@@ -201,12 +201,12 @@ class HttpClientRequestExecutorTest {
         }
     }
 
-    private HttpClientRequestExecutor createRequestExecutor(RequestAuthenticator requestAuthenticator = mock(RequestAuthenticator), int maxElapsed = 15, int maxAttempts = 4) {
+    private HttpClientRequestExecutor createRequestExecutor(RequestAuthenticator requestAuthenticator = mock(RequestAuthenticator), int maxElapsed = 15, int maxAttempts = 4, int maxConnectionTotal = Integer.MAX_VALUE, int maxConnectionPerRoute = Integer.MAX_VALUE/2) {
 
-        return new HttpClientRequestExecutor(createClientConfiguration(requestAuthenticator, maxElapsed, maxAttempts))
+        return new HttpClientRequestExecutor(createClientConfiguration(requestAuthenticator, maxElapsed, maxAttempts, maxConnectionTotal, maxConnectionPerRoute))
     }
 
-    private HttpClientConfiguration createClientConfiguration(RequestAuthenticator requestAuthenticator = mock(RequestAuthenticator), int maxElapsed = 15, int maxAttempts = 4) {
+    private HttpClientConfiguration createClientConfiguration(RequestAuthenticator requestAuthenticator = mock(RequestAuthenticator), int maxElapsed = 15, int maxAttempts = 4, int maxConnectionTotal = Integer.MAX_VALUE, int maxConnectionPerRoute = Integer.MAX_VALUE/2) {
 
         def clientConfig = mock(HttpClientConfiguration)
 
@@ -214,6 +214,8 @@ class HttpClientRequestExecutorTest {
         when(clientConfig.getConnectionTimeout()).thenReturn(1111)
         when(clientConfig.getRetryMaxElapsed()).thenReturn(maxElapsed)
         when(clientConfig.getRetryMaxAttempts()).thenReturn(maxAttempts)
+        when(clientConfig.getMaxConnectionTotal()).thenReturn(maxConnectionTotal)
+        when(clientConfig.getMaxConnectionPerRoute()).thenReturn(maxConnectionPerRoute)
 
         return clientConfig
     }
