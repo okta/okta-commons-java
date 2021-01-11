@@ -15,6 +15,7 @@
  */
 package com.okta.commons.http.httpclient
 
+import com.okta.commons.http.config.HttpClientConfiguration
 import org.testng.IHookCallBack
 import org.testng.IHookable
 import org.testng.ITestResult
@@ -27,25 +28,24 @@ import static org.hamcrest.Matchers.is
 
 class HttpClientRequestExecutorStaticConfigTest implements IHookable {
 
-    private static final String REQUEST_EXECUTOR_CLASSNAME = "com.okta.commons.http.httpclient.HttpClientRequestExecutor"
-
     @Test(dataProvider = "validateAfterInactivity")
     void validateAfterInactivityIsEmpty(String configValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity"
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }
-        def requestExecutor = isolatedClassLoader().loadClass(REQUEST_EXECUTOR_CLASSNAME)
-        assertThat requestExecutor.CONNECTION_VALIDATION_INACTIVITY, is(expectedValue)
+        def clientConfiguration = new HttpClientConfiguration()
+        assertThat clientConfiguration.getConnectionValidationInactivity(), is(expectedValue)
     }
+
     @Test(dataProvider = "timeToLive")
     void timeToLive(String configValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive"
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }
-        def requestExecutor = isolatedClassLoader().loadClass(REQUEST_EXECUTOR_CLASSNAME)
-        assertThat requestExecutor.CONNECTION_TIME_TO_LIVE, is(expectedValue)
+        def clientConfiguration = new HttpClientConfiguration()
+        assertThat clientConfiguration.getConnectionTimeToLive(), is(expectedValue)
     }
 
     @Test(dataProvider = "maxConnections")
@@ -54,8 +54,8 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }
-        def requestExecutor = isolatedClassLoader().loadClass(REQUEST_EXECUTOR_CLASSNAME)
-        assertThat requestExecutor.MAX_CONNECTIONS_TOTAL, is(expectedValue)
+        def clientConfiguration = new HttpClientConfiguration()
+        assertThat clientConfiguration.getMaxConnectionTotal(), is(expectedValue)
     }
 
     @Test(dataProvider = "maxConnectionsPerRoute")
@@ -64,8 +64,8 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }
-        def requestExecutor = isolatedClassLoader().loadClass(REQUEST_EXECUTOR_CLASSNAME)
-        assertThat requestExecutor.MAX_CONNECTIONS_PER_ROUTE, is(expectedValue)
+        def clientConfiguration = new HttpClientConfiguration()
+        assertThat clientConfiguration.getMaxConnectionPerRoute(), is(expectedValue)
     }
 
     @DataProvider
@@ -98,12 +98,6 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
                ["12", 12],
                [null, defaultValue]
         ]
-    }
-
-    static ClassLoader isolatedClassLoader() {
-        def originalClassLoader = Thread.currentThread().getContextClassLoader()
-        URLClassLoader oldClassLoader = (URLClassLoader) originalClassLoader
-        return new URLClassLoader(oldClassLoader.getURLs(), (ClassLoader) null)
     }
 
     @Override
