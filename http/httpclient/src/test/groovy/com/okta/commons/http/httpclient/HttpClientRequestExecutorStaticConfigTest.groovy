@@ -30,7 +30,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
 
     @Test(dataProvider = "validateAfterInactivity")
     void validateAfterInactivityIsEmpty(String configValue, int expectedValue) {
-        def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity"
+        def prop = "okta.client.httpclient.validateAfterInactivity"
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }
@@ -40,7 +40,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
 
     @Test(dataProvider = "timeToLive")
     void timeToLive(String configValue, int expectedValue) {
-        def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive"
+        def prop = "okta.client.httpclient.timeToLive"
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }
@@ -50,7 +50,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
 
     @Test(dataProvider = "maxConnections")
     void maxConnections(String configValue, int expectedValue) {
-        def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxTotal"
+        def prop = "okta.client.httpclient.maxTotal"
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }
@@ -60,7 +60,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
 
     @Test(dataProvider = "maxConnectionsPerRoute")
     void maxConnectionsPerRoute(String configValue, int expectedValue) {
-        def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxPerRoute"
+        def prop = "okta.client.httpclient.maxPerRoute"
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }

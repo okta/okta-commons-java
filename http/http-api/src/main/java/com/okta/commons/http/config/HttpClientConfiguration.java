@@ -74,11 +74,9 @@ public class HttpClientConfiguration implements ClientConfiguration {
 
             if (ENVVARS_TOKEN.equalsIgnoreCase(location)) {
                 sources.add(EnvironmentVariablesPropertiesSource.oktaFilteredPropertiesSource());
-            }
-            else if (SYSPROPS_TOKEN.equalsIgnoreCase(location)) {
+            } else if (SYSPROPS_TOKEN.equalsIgnoreCase(location)) {
                 sources.add(SystemPropertiesSource.oktaFilteredPropertiesSource());
-            }
-            else {
+            } else {
                 Resource resource = resourceFactory.createResource(location);
 
                 PropertiesSource wrappedSource;
@@ -100,29 +98,29 @@ public class HttpClientConfiguration implements ClientConfiguration {
             props.putAll(srcProps);
         }
 
-        if (Strings.hasText(props.get(MAX_CONNECTIONS_PER_ROUTE_PROPERTY_NAME))) {
-            this.setMaxConnectionPerRoute(Integer.parseInt(props.get(MAX_CONNECTIONS_PER_ROUTE_PROPERTY_NAME)));
-        } else {
-            this.setMaxConnectionPerRoute(MAX_CONNECTIONS_PER_ROUTE_PROPERTY_VALUE_DEFAULT);
-        }
+        this.setMaxConnectionPerRoute(
+            tryParse(
+                props.get(MAX_CONNECTIONS_PER_ROUTE_PROPERTY_NAME),
+                MAX_CONNECTIONS_PER_ROUTE_PROPERTY_VALUE_DEFAULT)
+        );
 
-        if (Strings.hasText(props.get(MAX_CONNECTIONS_TOTAL_PROPERTY_NAME))) {
-            this.setMaxConnectionTotal(Integer.parseInt(props.get(MAX_CONNECTIONS_TOTAL_PROPERTY_NAME)));
-        } else {
-            this.setMaxConnectionTotal(MAX_CONNECTIONS_TOTAL_PROPERTY_VALUE_DEFAULT);
-        }
+        this.setMaxConnectionTotal(
+            tryParse(
+                props.get(MAX_CONNECTIONS_TOTAL_PROPERTY_NAME),
+                MAX_CONNECTIONS_TOTAL_PROPERTY_VALUE_DEFAULT)
+        );
 
-        if (Strings.hasText(props.get(CONNECTION_VALIDATION_INACTIVITY_PROPERTY_NAME))) {
-            this.setConnectionValidationInactivity(Integer.parseInt(props.get(CONNECTION_VALIDATION_INACTIVITY_PROPERTY_NAME)));
-        } else {
-            this.setConnectionValidationInactivity(CONNECTION_VALIDATION_INACTIVITY_PROPERTY_VALUE_DEFAULT);
-        }
+        this.setConnectionValidationInactivity(
+            tryParse(
+                props.get(CONNECTION_VALIDATION_INACTIVITY_PROPERTY_NAME),
+                CONNECTION_VALIDATION_INACTIVITY_PROPERTY_VALUE_DEFAULT)
+        );
 
-        if (Strings.hasText(props.get(CONNECTION_TIME_TO_LIVE_PROPERTY_NAME))) {
-            this.setConnectionTimeToLive(Integer.parseInt(props.get(CONNECTION_TIME_TO_LIVE_PROPERTY_NAME)));
-        } else {
-            this.setConnectionTimeToLive(CONNECTION_TIME_TO_LIVE_PROPERTY_VALUE_DEFAULT);
-        }
+        this.setConnectionTimeToLive(
+            tryParse(
+                props.get(CONNECTION_TIME_TO_LIVE_PROPERTY_NAME),
+                CONNECTION_TIME_TO_LIVE_PROPERTY_VALUE_DEFAULT)
+        );
     }
 
     public RequestAuthenticator getRequestAuthenticator() {
@@ -278,6 +276,14 @@ public class HttpClientConfiguration implements ClientConfiguration {
             ENVVARS_TOKEN,
             SYSPROPS_TOKEN
         };
+    }
+
+    private int tryParse(String value, int defaultVal) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            return defaultVal;
+        }
     }
 
     @Override

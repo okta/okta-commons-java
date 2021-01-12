@@ -2,10 +2,10 @@ package com.okta.commons.http.config;
 
 public interface ClientConfiguration {
 
-    String MAX_CONNECTIONS_PER_ROUTE_PROPERTY_NAME = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxPerRoute";
-    String MAX_CONNECTIONS_TOTAL_PROPERTY_NAME = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxTotal";
-    String CONNECTION_VALIDATION_INACTIVITY_PROPERTY_NAME = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity";
-    String CONNECTION_TIME_TO_LIVE_PROPERTY_NAME = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive";
+    String MAX_CONNECTIONS_PER_ROUTE_PROPERTY_NAME = "okta.client.httpclient.maxPerRoute";
+    String MAX_CONNECTIONS_TOTAL_PROPERTY_NAME = "okta.client.httpclient.maxTotal";
+    String CONNECTION_VALIDATION_INACTIVITY_PROPERTY_NAME = "okta.client.httpclient.validateAfterInactivity";
+    String CONNECTION_TIME_TO_LIVE_PROPERTY_NAME = "okta.client.httpclient.timeToLive";
 
     int MAX_CONNECTIONS_PER_ROUTE_PROPERTY_VALUE_DEFAULT = Integer.MAX_VALUE/2;
     int MAX_CONNECTIONS_TOTAL_PROPERTY_VALUE_DEFAULT = Integer.MAX_VALUE;
