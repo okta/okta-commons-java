@@ -93,18 +93,18 @@ public class HttpClientRequestExecutor implements RequestExecutor {
             connMgr.setDefaultMaxPerRoute(clientConfiguration.getMaxConnectionPerRoute());
             connMgr.setMaxTotal(clientConfiguration.getMaxConnectionTotal());
         } else {
-            connMgr.setDefaultMaxPerRoute(clientConfiguration.getMaxConnectionPerRouteDefault());
-            connMgr.setMaxTotal(clientConfiguration.getMaxConnectionTotalDefault());
+            connMgr.setDefaultMaxPerRoute(clientConfiguration.MAX_CONNECTIONS_PER_ROUTE_PROPERTY_VALUE_DEFAULT);
+            connMgr.setMaxTotal(clientConfiguration.MAX_CONNECTIONS_TOTAL_PROPERTY_VALUE_DEFAULT);
 
             log.warn(
                 "{} ({}) is less than {} ({}). " +
                 "Reverting to defaults: connectionMaxTotal ({}) and connectionMaxPerRoute ({}).",
-                clientConfiguration.getMaxConnectionsPerRoutePropertyKey(),
+                clientConfiguration.MAX_CONNECTIONS_PER_ROUTE_PROPERTY_NAME,
                 clientConfiguration.getMaxConnectionTotal(),
-                clientConfiguration.getMaxConnectionsTotalPropertyKey(),
+                clientConfiguration.MAX_CONNECTIONS_TOTAL_PROPERTY_NAME,
                 clientConfiguration.getMaxConnectionPerRoute(),
-                clientConfiguration.getMaxConnectionTotalDefault(),
-                clientConfiguration.getMaxConnectionPerRouteDefault()
+                clientConfiguration.MAX_CONNECTIONS_TOTAL_PROPERTY_VALUE_DEFAULT,
+                clientConfiguration.MAX_CONNECTIONS_PER_ROUTE_PROPERTY_VALUE_DEFAULT
             );
         }
 
