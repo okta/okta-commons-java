@@ -40,8 +40,6 @@ import java.util.Map;
  */
 public class HttpClientConfiguration implements ClientConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(HttpClientConfiguration.class);
-
     private static final String ENVVARS_TOKEN   = "envvars";
     private static final String SYSPROPS_TOKEN  = "sysprops";
     private static final String OKTA_CONFIG_CP  = "com/okta/sdk/config/";
