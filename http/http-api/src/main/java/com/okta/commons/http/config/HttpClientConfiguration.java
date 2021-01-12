@@ -23,8 +23,6 @@ import com.okta.sdk.impl.io.ClasspathResource;
 import com.okta.sdk.impl.io.DefaultResourceFactory;
 import com.okta.sdk.impl.io.Resource;
 import com.okta.sdk.impl.io.ResourceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
