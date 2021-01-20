@@ -86,12 +86,12 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
         this.requestAuthenticator = clientConfiguration.getRequestAuthenticator();
 
-        PoolingHttpClientConnectionManager connMgr = new PoolingHttpClientConnectionManager(clientConfiguration.getTimeToLive(), TimeUnit.MILLISECONDS);
-        connMgr.setValidateAfterInactivity(clientConfiguration.getValidateAfterInactivity());
+        PoolingHttpClientConnectionManager connMgr = new PoolingHttpClientConnectionManager(clientConfiguration.getConnectionTimeToLive(), TimeUnit.MILLISECONDS);
+        connMgr.setValidateAfterInactivity(clientConfiguration.getMaxConnectionInactivity());
 
-        if (clientConfiguration.getMaxTotal() >= clientConfiguration.getMaxPerRoute()) {
-            connMgr.setDefaultMaxPerRoute(clientConfiguration.getMaxPerRoute());
-            connMgr.setMaxTotal(clientConfiguration.getMaxTotal());
+        if (clientConfiguration.getMaxConnectionTotal() >= clientConfiguration.getMaxConnectionPerRoute()) {
+            connMgr.setDefaultMaxPerRoute(clientConfiguration.getMaxConnectionPerRoute());
+            connMgr.setMaxTotal(clientConfiguration.getMaxConnectionTotal());
         } else {
             connMgr.setDefaultMaxPerRoute(HttpClientConfiguration.DEFAULT_MAX_CONNECTIONS_PER_ROUTE);
             connMgr.setMaxTotal(HttpClientConfiguration.DEFAULT_MAX_CONNECTIONS_TOTAL);
@@ -100,9 +100,9 @@ public class HttpClientRequestExecutor implements RequestExecutor {
                 "{} ({}) is less than {} ({}). " +
                 "Reverting to defaults: connectionMaxTotal ({}) and connectionMaxPerRoute ({}).",
                 HttpClientConfiguration.MAX_CONNECTIONS_TOTAL_PROPERTY_KEY,
-                clientConfiguration.getMaxTotal(),
+                clientConfiguration.getMaxConnectionTotal(),
                 HttpClientConfiguration.MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY,
-                clientConfiguration.getMaxPerRoute(),
+                clientConfiguration.getMaxConnectionPerRoute(),
                 HttpClientConfiguration.DEFAULT_MAX_CONNECTIONS_TOTAL,
                 HttpClientConfiguration.DEFAULT_MAX_CONNECTIONS_PER_ROUTE
             );
@@ -240,19 +240,5 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         }
 
         return headers;
-    }
-
-    private static int parseConfigValue(String key, int defaultValue, String warning) {
-
-        int configuredValue = defaultValue;
-        String configuredValueString = System.getProperty(key);
-        if (configuredValueString != null) {
-            try {
-                configuredValue = Integer.parseInt(configuredValueString);
-            } catch (NumberFormatException nfe) {
-                log.warn("{}: {}. Using default: {}.", warning, configuredValueString, defaultValue, nfe);
-            }
-        }
-        return configuredValue;
     }
 }

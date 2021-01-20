@@ -168,7 +168,7 @@ public class HttpClientConfiguration {
         }
     }
 
-    public int getMaxPerRoute() {
+    public int getMaxConnectionPerRoute() {
         return getRequestExecutorParam(
             "maxPerRoute",
             "Bad max connection per route value",
@@ -176,7 +176,7 @@ public class HttpClientConfiguration {
         );
     }
 
-    public int getMaxTotal() {
+    public int getMaxConnectionTotal() {
         return getRequestExecutorParam(
             "maxTotal",
             "Bad max connection total value",
@@ -184,7 +184,7 @@ public class HttpClientConfiguration {
         );
     }
 
-    public int getValidateAfterInactivity() {
+    public int getMaxConnectionInactivity() {
         return getRequestExecutorParam(
             "validateAfterInactivity",
             "Invalid max connection inactivity validation value",
@@ -192,7 +192,7 @@ public class HttpClientConfiguration {
         );
     }
 
-    public int getTimeToLive() {
+    public int getConnectionTimeToLive() {
         return getRequestExecutorParam(
             "timeToLive",
             "Invalid connection time to live value",
@@ -225,10 +225,10 @@ public class HttpClientConfiguration {
                 ", retryMaxElapsed=" + retryMaxElapsed +
                 ", retryMaxAttempts=" + retryMaxAttempts +
                 ", proxy=" + proxy +
-                ", maxPerRoute=" + getMaxPerRoute() +
-                ", maxTotal=" + getMaxTotal() +
-                ", validateAfterInactivity=" + getValidateAfterInactivity() +
-                ", timeToLive=" + getTimeToLive() +
+                ", maxPerRoute=" + getMaxConnectionPerRoute() +
+                ", maxTotal=" + getMaxConnectionTotal() +
+                ", validateAfterInactivity=" + getMaxConnectionInactivity() +
+                ", timeToLive=" + getConnectionTimeToLive() +
                 '}';
     }
 }

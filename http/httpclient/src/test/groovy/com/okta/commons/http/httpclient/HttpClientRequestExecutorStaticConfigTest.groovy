@@ -35,7 +35,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
             put("validateAfterInactivity", configValue)
         }}
         clientConfiguration.setRequestExecutorParams(configMap)
-        assertThat clientConfiguration.getValidateAfterInactivity(), is(expectedValue)
+        assertThat clientConfiguration.getMaxConnectionInactivity(), is(expectedValue)
     }
 
     @Test(dataProvider = "timeToLive")
@@ -45,7 +45,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
             put("timeToLive", configValue)
         }}
         clientConfiguration.setRequestExecutorParams(configMap)
-        assertThat clientConfiguration.getTimeToLive(), is(expectedValue)
+        assertThat clientConfiguration.getConnectionTimeToLive(), is(expectedValue)
     }
 
     @Test(dataProvider = "maxConnections")
@@ -55,7 +55,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
             put("maxTotal", configValue)
         }}
         clientConfiguration.setRequestExecutorParams(configMap)
-        assertThat clientConfiguration.getMaxTotal(), is(expectedValue)
+        assertThat clientConfiguration.getMaxConnectionTotal(), is(expectedValue)
     }
 
     @Test(dataProvider = "maxConnectionsPerRoute")
@@ -65,7 +65,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
             put("maxPerRoute", configValue)
         }}
         clientConfiguration.setRequestExecutorParams(configMap)
-        assertThat clientConfiguration.getMaxPerRoute(), is(expectedValue)
+        assertThat clientConfiguration.getMaxConnectionPerRoute(), is(expectedValue)
     }
 
     @DataProvider
