@@ -29,43 +29,43 @@ import static org.hamcrest.Matchers.is
 class HttpClientRequestExecutorStaticConfigTest implements IHookable {
 
     @Test(dataProvider = "validateAfterInactivity")
-    void validateAfterInactivityIsEmpty(String configValue, int expectedValue) {
-        def prop = "okta.client.httpclient.validateAfterInactivity"
-        if (configValue != null) {
-            System.properties.setProperty(prop, configValue)
-        }
+    void validateAfterInactivityTest(String configValue, int expectedValue) {
         def clientConfiguration = new HttpClientConfiguration()
-        assertThat clientConfiguration.getConnectionValidationInactivity(), is(expectedValue)
+        def configMap  = new HashMap<String, String>() {{
+            put("validateAfterInactivity", configValue)
+        }}
+        clientConfiguration.setRequestExecutorParams(configMap)
+        assertThat clientConfiguration.getValidateAfterInactivity(), is(expectedValue)
     }
 
     @Test(dataProvider = "timeToLive")
-    void timeToLive(String configValue, int expectedValue) {
-        def prop = "okta.client.httpclient.timeToLive"
-        if (configValue != null) {
-            System.properties.setProperty(prop, configValue)
-        }
+    void timeToLiveTest(String configValue, int expectedValue) {
         def clientConfiguration = new HttpClientConfiguration()
-        assertThat clientConfiguration.getConnectionTimeToLive(), is(expectedValue)
+        def configMap  = new HashMap<String, String>() {{
+            put("timeToLive", configValue)
+        }}
+        clientConfiguration.setRequestExecutorParams(configMap)
+        assertThat clientConfiguration.getTimeToLive(), is(expectedValue)
     }
 
     @Test(dataProvider = "maxConnections")
-    void maxConnections(String configValue, int expectedValue) {
-        def prop = "okta.client.httpclient.maxTotal"
-        if (configValue != null) {
-            System.properties.setProperty(prop, configValue)
-        }
+    void maxConnectionsTest(String configValue, int expectedValue) {
         def clientConfiguration = new HttpClientConfiguration()
-        assertThat clientConfiguration.getMaxConnectionTotal(), is(expectedValue)
+        def configMap  = new HashMap<String, String>() {{
+            put("maxTotal", configValue)
+        }}
+        clientConfiguration.setRequestExecutorParams(configMap)
+        assertThat clientConfiguration.getMaxTotal(), is(expectedValue)
     }
 
     @Test(dataProvider = "maxConnectionsPerRoute")
-    void maxConnectionsPerRoute(String configValue, int expectedValue) {
-        def prop = "okta.client.httpclient.maxPerRoute"
-        if (configValue != null) {
-            System.properties.setProperty(prop, configValue)
-        }
+    void maxConnectionsPerRouteTest(String configValue, int expectedValue) {
         def clientConfiguration = new HttpClientConfiguration()
-        assertThat clientConfiguration.getMaxConnectionPerRoute(), is(expectedValue)
+        def configMap  = new HashMap<String, String>() {{
+            put("maxPerRoute", configValue)
+        }}
+        clientConfiguration.setRequestExecutorParams(configMap)
+        assertThat clientConfiguration.getMaxPerRoute(), is(expectedValue)
     }
 
     @DataProvider
@@ -98,6 +98,12 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
                ["12", 12],
                [null, defaultValue]
         ]
+    }
+
+    static ClassLoader isolatedClassLoader() {
+        def originalClassLoader = Thread.currentThread().getContextClassLoader()
+        URLClassLoader oldClassLoader = (URLClassLoader) originalClassLoader
+        return new URLClassLoader(oldClassLoader.getURLs(), (ClassLoader) null)
     }
 
     @Override

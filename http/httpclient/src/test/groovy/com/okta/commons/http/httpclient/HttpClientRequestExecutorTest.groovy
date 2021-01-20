@@ -212,8 +212,8 @@ class HttpClientRequestExecutorTest {
         when(clientConfig.getConnectionTimeout()).thenReturn(1111)
         when(clientConfig.getRetryMaxElapsed()).thenReturn(maxElapsed)
         when(clientConfig.getRetryMaxAttempts()).thenReturn(maxAttempts)
-        when(clientConfig.getMaxConnectionTotal()).thenReturn(maxConnectionTotal)
-        when(clientConfig.getMaxConnectionPerRoute()).thenReturn(maxConnectionPerRoute)
+        when(clientConfig.getMaxTotal()).thenReturn(maxConnectionTotal)
+        when(clientConfig.getMaxPerRoute()).thenReturn(maxConnectionPerRoute)
 
         return clientConfig
     }

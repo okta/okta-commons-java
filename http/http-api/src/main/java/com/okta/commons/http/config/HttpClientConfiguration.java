@@ -17,17 +17,10 @@
 package com.okta.commons.http.config;
 
 import com.okta.commons.http.authc.RequestAuthenticator;
-import com.okta.commons.lang.Strings;
-import com.okta.sdk.impl.config.*;
-import com.okta.sdk.impl.io.ClasspathResource;
-import com.okta.sdk.impl.io.DefaultResourceFactory;
-import com.okta.sdk.impl.io.Resource;
-import com.okta.sdk.impl.io.ResourceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -36,13 +29,9 @@ import java.util.Map;
  *
  * @since 0.5.0
  */
-public class HttpClientConfiguration implements ClientConfiguration {
+public class HttpClientConfiguration {
 
-    private static final String ENVVARS_TOKEN   = "envvars";
-    private static final String SYSPROPS_TOKEN  = "sysprops";
-    private static final String OKTA_CONFIG_CP  = "com/okta/sdk/config/";
-    private static final String OKTA_YAML       = "okta.yaml";
-    private static final String OKTA_PROPERTIES = "okta.properties";
+    private static final Logger log = LoggerFactory.getLogger(HttpClientConfiguration.class);
 
     private String baseUrl;
     private int connectionTimeout;
@@ -54,70 +43,17 @@ public class HttpClientConfiguration implements ClientConfiguration {
     private Proxy proxy;
     private int retryMaxElapsed = 0;
     private int retryMaxAttempts = 0;
-    private int maxConnectionPerRoute;
-    private int maxConnectionTotal;
-    private int connectionValidationInactivity;
-    private int connectionTimeToLive;
+    private final Map<String, String> requestExecutorParams = new HashMap<>();
 
-    public HttpClientConfiguration() {
-        this(new DefaultResourceFactory());
-    }
+    public static final int DEFAULT_MAX_CONNECTIONS_PER_ROUTE = Integer.MAX_VALUE/2;
+    public static final int DEFAULT_MAX_CONNECTIONS_TOTAL = Integer.MAX_VALUE;
+    public static final int DEFAULT_CONNECTION_VALIDATION_INACTIVITY = 2000; // 2sec
+    public static final int DEFAULT_CONNECTION_TIME_TO_LIVE = 5 * 1000 * 60; // 5 minutes
 
-    HttpClientConfiguration(ResourceFactory resourceFactory) {
-        Collection<PropertiesSource> sources = new ArrayList<>();
-
-        for (String location : configSources()) {
-
-            if (ENVVARS_TOKEN.equalsIgnoreCase(location)) {
-                sources.add(EnvironmentVariablesPropertiesSource.oktaFilteredPropertiesSource());
-            } else if (SYSPROPS_TOKEN.equalsIgnoreCase(location)) {
-                sources.add(SystemPropertiesSource.oktaFilteredPropertiesSource());
-            } else {
-                Resource resource = resourceFactory.createResource(location);
-
-                PropertiesSource wrappedSource;
-                if (Strings.endsWithIgnoreCase(location, ".yaml")) {
-                    wrappedSource = new YAMLPropertiesSource(resource);
-                } else {
-                    wrappedSource = new ResourcePropertiesSource(resource);
-                }
-
-                PropertiesSource propertiesSource = new OptionalPropertiesSource(wrappedSource);
-                sources.add(propertiesSource);
-            }
-        }
-
-        Map<String, String> props = new LinkedHashMap<>();
-
-        for (PropertiesSource source : sources) {
-            Map<String, String> srcProps = source.getProperties();
-            props.putAll(srcProps);
-        }
-
-        this.setMaxConnectionPerRoute(
-            tryParse(
-                props.get(MAX_CONNECTIONS_PER_ROUTE_PROPERTY_NAME),
-                MAX_CONNECTIONS_PER_ROUTE_PROPERTY_VALUE_DEFAULT)
-        );
-
-        this.setMaxConnectionTotal(
-            tryParse(
-                props.get(MAX_CONNECTIONS_TOTAL_PROPERTY_NAME),
-                MAX_CONNECTIONS_TOTAL_PROPERTY_VALUE_DEFAULT)
-        );
-
-        this.setConnectionValidationInactivity(
-            tryParse(
-                props.get(CONNECTION_VALIDATION_INACTIVITY_PROPERTY_NAME),
-                CONNECTION_VALIDATION_INACTIVITY_PROPERTY_VALUE_DEFAULT)
-        );
-
-        this.setConnectionTimeToLive(
-            tryParse(
-                props.get(CONNECTION_TIME_TO_LIVE_PROPERTY_NAME),
-                CONNECTION_TIME_TO_LIVE_PROPERTY_VALUE_DEFAULT)
-        );
-    }
+    public static final String MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxPerRoute";
+    public static final String MAX_CONNECTIONS_TOTAL_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxTotal";
+    public static final String CONNECTION_VALIDATION_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity";
+    public static final String CONNECTION_TIME_TO_LIVE_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive";
 
     public RequestAuthenticator getRequestAuthenticator() {
         return requestAuthenticator;
@@ -224,62 +160,60 @@ public class HttpClientConfiguration implements ClientConfiguration {
         return this;
     }
 
-    public Integer getMaxConnectionPerRoute() {
-        return this.maxConnectionPerRoute;
-    }
-
-    public HttpClientConfiguration setMaxConnectionPerRoute(int maxConnectionPerRoute) {
-        this.maxConnectionPerRoute = maxConnectionPerRoute;
-        return this;
-    }
-
-    public Integer getMaxConnectionTotal() {
-        return this.maxConnectionTotal;
-    }
-
-    public HttpClientConfiguration setMaxConnectionTotal(int maxConnectionTotal) {
-        this.maxConnectionTotal = maxConnectionTotal;
-        return this;
-    }
-
-    public Integer getConnectionValidationInactivity() {
-        return this.connectionValidationInactivity;
-    }
-
-    public HttpClientConfiguration setConnectionValidationInactivity(int connectionValidationInactivity) {
-        this.connectionValidationInactivity = connectionValidationInactivity;
-        return this;
-    }
-
-    public int getConnectionTimeToLive() {
-        return this.connectionTimeToLive;
-    }
-
-    public HttpClientConfiguration setConnectionTimeToLive(int connectionTimeToLive) {
-        this.connectionTimeToLive = connectionTimeToLive;
-        return this;
-    }
-
-    private static String[] configSources() {
-
-        // lazy load the config sources as the user.home system prop could change for testing
-        return new String[] {
-            ClasspathResource.SCHEME_PREFIX + OKTA_CONFIG_CP + OKTA_PROPERTIES,
-            ClasspathResource.SCHEME_PREFIX + OKTA_CONFIG_CP + OKTA_YAML,
-            ClasspathResource.SCHEME_PREFIX + OKTA_PROPERTIES,
-            ClasspathResource.SCHEME_PREFIX + OKTA_YAML,
-            System.getProperty("user.home") + File.separatorChar + ".okta" + File.separatorChar + OKTA_YAML,
-            ENVVARS_TOKEN,
-            SYSPROPS_TOKEN
-        };
-    }
-
-    private int tryParse(String value, int defaultVal) {
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException e) {
-            return defaultVal;
+    public void setRequestExecutorParams(Map<String, String> map) {
+        if (map != null) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                this.requestExecutorParams.put(entry.getKey(), entry.getValue());
+            }
         }
+    }
+
+    public int getMaxPerRoute() {
+        return getRequestExecutorParam(
+            "maxPerRoute",
+            "Bad max connection per route value",
+            DEFAULT_MAX_CONNECTIONS_PER_ROUTE
+        );
+    }
+
+    public int getMaxTotal() {
+        return getRequestExecutorParam(
+            "maxTotal",
+            "Bad max connection total value",
+            DEFAULT_MAX_CONNECTIONS_TOTAL
+        );
+    }
+
+    public int getValidateAfterInactivity() {
+        return getRequestExecutorParam(
+            "validateAfterInactivity",
+            "Invalid max connection inactivity validation value",
+            DEFAULT_CONNECTION_VALIDATION_INACTIVITY
+        );
+    }
+
+    public int getTimeToLive() {
+        return getRequestExecutorParam(
+            "timeToLive",
+            "Invalid connection time to live value",
+            DEFAULT_CONNECTION_TIME_TO_LIVE
+        );
+    }
+
+    public int getRequestExecutorParam(String key, String warning, int defaultValue) {
+        String configuredValueString = this.requestExecutorParams.get(key);
+        try {
+            if (configuredValueString != null) {
+                return Integer.parseInt(configuredValueString);
+            }
+        } catch (NumberFormatException nfe) {
+            log.warn("{}: {}. Using default: {}.",
+                warning,
+                configuredValueString,
+                defaultValue,
+                nfe);
+        }
+        return defaultValue;
     }
 
     @Override
@@ -291,10 +225,10 @@ public class HttpClientConfiguration implements ClientConfiguration {
                 ", retryMaxElapsed=" + retryMaxElapsed +
                 ", retryMaxAttempts=" + retryMaxAttempts +
                 ", proxy=" + proxy +
-                ", maxConnectionPerRoute=" + maxConnectionPerRoute +
-                ", maxConnectionTotal=" + maxConnectionTotal +
-                ", connectionValidationInactivity=" + connectionValidationInactivity +
-                ", connectionTimeToLive=" + connectionTimeToLive +
+                ", maxPerRoute=" + getMaxPerRoute() +
+                ", maxTotal=" + getMaxTotal() +
+                ", validateAfterInactivity=" + getValidateAfterInactivity() +
+                ", timeToLive=" + getTimeToLive() +
                 '}';
     }
 }
