@@ -34,13 +34,11 @@ import org.apache.http.StatusLine
 import org.apache.http.client.HttpClient
 import org.apache.http.client.methods.HttpRequestBase
 import org.apache.http.conn.ConnectTimeoutException
-import org.apache.http.message.BasicHeader
 import org.testng.Assert
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 
 import java.nio.charset.StandardCharsets
-import java.text.SimpleDateFormat
 import java.time.Duration
 
 import static org.hamcrest.MatcherAssert.assertThat
@@ -201,12 +199,12 @@ class HttpClientRequestExecutorTest {
         }
     }
 
-    private HttpClientRequestExecutor createRequestExecutor(RequestAuthenticator requestAuthenticator = mock(RequestAuthenticator), int maxElapsed = 15, int maxAttempts = 4) {
+    private HttpClientRequestExecutor createRequestExecutor(RequestAuthenticator requestAuthenticator = mock(RequestAuthenticator), int maxElapsed = 15, int maxAttempts = 4, int maxConnectionTotal = Integer.MAX_VALUE, int maxConnectionPerRoute = Integer.MAX_VALUE/2) {
 
-        return new HttpClientRequestExecutor(createClientConfiguration(requestAuthenticator, maxElapsed, maxAttempts))
+        return new HttpClientRequestExecutor(createClientConfiguration(requestAuthenticator, maxElapsed, maxAttempts, maxConnectionTotal, maxConnectionPerRoute))
     }
 
-    private HttpClientConfiguration createClientConfiguration(RequestAuthenticator requestAuthenticator = mock(RequestAuthenticator), int maxElapsed = 15, int maxAttempts = 4) {
+    private HttpClientConfiguration createClientConfiguration(RequestAuthenticator requestAuthenticator = mock(RequestAuthenticator), int maxElapsed = 15, int maxAttempts = 4, int maxConnectionTotal = Integer.MAX_VALUE, int maxConnectionPerRoute = Integer.MAX_VALUE/2) {
 
         def clientConfig = mock(HttpClientConfiguration)
 
@@ -214,6 +212,8 @@ class HttpClientRequestExecutorTest {
         when(clientConfig.getConnectionTimeout()).thenReturn(1111)
         when(clientConfig.getRetryMaxElapsed()).thenReturn(maxElapsed)
         when(clientConfig.getRetryMaxAttempts()).thenReturn(maxAttempts)
+        when(clientConfig.getMaxTotal()).thenReturn(maxConnectionTotal)
+        when(clientConfig.getMaxPerRoute()).thenReturn(maxConnectionPerRoute)
 
         return clientConfig
     }

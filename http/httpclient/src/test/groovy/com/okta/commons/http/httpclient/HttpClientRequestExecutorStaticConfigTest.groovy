@@ -15,6 +15,7 @@
  */
 package com.okta.commons.http.httpclient
 
+import com.okta.commons.http.config.HttpClientConfiguration
 import org.testng.IHookCallBack
 import org.testng.IHookable
 import org.testng.ITestResult
@@ -27,45 +28,44 @@ import static org.hamcrest.Matchers.is
 
 class HttpClientRequestExecutorStaticConfigTest implements IHookable {
 
-    private static final String REQUEST_EXECUTOR_CLASSNAME = "com.okta.commons.http.httpclient.HttpClientRequestExecutor"
-
     @Test(dataProvider = "validateAfterInactivity")
-    void validateAfterInactivityIsEmpty(String configValue, int expectedValue) {
-        def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity"
-        if (configValue != null) {
-            System.properties.setProperty(prop, configValue)
-        }
-        def requestExecutor = isolatedClassLoader().loadClass(REQUEST_EXECUTOR_CLASSNAME)
-        assertThat requestExecutor.CONNECTION_VALIDATION_INACTIVITY, is(expectedValue)
+    void validateAfterInactivityTest(String configValue, int expectedValue) {
+        def clientConfiguration = new HttpClientConfiguration()
+        def configMap  = new HashMap<String, String>() {{
+            put("validateAfterInactivity", configValue)
+        }}
+        clientConfiguration.setRequestExecutorParams(configMap)
+        assertThat clientConfiguration.getValidateAfterInactivity(), is(expectedValue)
     }
+
     @Test(dataProvider = "timeToLive")
-    void timeToLive(String configValue, int expectedValue) {
-        def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive"
-        if (configValue != null) {
-            System.properties.setProperty(prop, configValue)
-        }
-        def requestExecutor = isolatedClassLoader().loadClass(REQUEST_EXECUTOR_CLASSNAME)
-        assertThat requestExecutor.CONNECTION_TIME_TO_LIVE, is(expectedValue)
+    void timeToLiveTest(String configValue, int expectedValue) {
+        def clientConfiguration = new HttpClientConfiguration()
+        def configMap  = new HashMap<String, String>() {{
+            put("timeToLive", configValue)
+        }}
+        clientConfiguration.setRequestExecutorParams(configMap)
+        assertThat clientConfiguration.getTimeToLive(), is(expectedValue)
     }
 
     @Test(dataProvider = "maxConnections")
-    void maxConnections(String configValue, int expectedValue) {
-        def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxTotal"
-        if (configValue != null) {
-            System.properties.setProperty(prop, configValue)
-        }
-        def requestExecutor = isolatedClassLoader().loadClass(REQUEST_EXECUTOR_CLASSNAME)
-        assertThat requestExecutor.MAX_CONNECTIONS_TOTAL, is(expectedValue)
+    void maxConnectionsTest(String configValue, int expectedValue) {
+        def clientConfiguration = new HttpClientConfiguration()
+        def configMap  = new HashMap<String, String>() {{
+            put("maxTotal", configValue)
+        }}
+        clientConfiguration.setRequestExecutorParams(configMap)
+        assertThat clientConfiguration.getMaxTotal(), is(expectedValue)
     }
 
     @Test(dataProvider = "maxConnectionsPerRoute")
-    void maxConnectionsPerRoute(String configValue, int expectedValue) {
-        def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxPerRoute"
-        if (configValue != null) {
-            System.properties.setProperty(prop, configValue)
-        }
-        def requestExecutor = isolatedClassLoader().loadClass(REQUEST_EXECUTOR_CLASSNAME)
-        assertThat requestExecutor.MAX_CONNECTIONS_PER_ROUTE, is(expectedValue)
+    void maxConnectionsPerRouteTest(String configValue, int expectedValue) {
+        def clientConfiguration = new HttpClientConfiguration()
+        def configMap  = new HashMap<String, String>() {{
+            put("maxPerRoute", configValue)
+        }}
+        clientConfiguration.setRequestExecutorParams(configMap)
+        assertThat clientConfiguration.getMaxPerRoute(), is(expectedValue)
     }
 
     @DataProvider
