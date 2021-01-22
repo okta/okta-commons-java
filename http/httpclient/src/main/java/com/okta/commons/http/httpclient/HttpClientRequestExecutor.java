@@ -57,6 +57,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -70,11 +72,28 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
     private static final Logger log = LoggerFactory.getLogger(HttpClientRequestExecutor.class);
 
+    private static final String MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxPerRoute";
+    private static final String MAX_CONNECTIONS_TOTAL_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxTotal";
+    private static final String CONNECTION_VALIDATION_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity";
+    private static final String CONNECTION_TIME_TO_LIVE_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive";
+
+    private static final String DEFAULT_REQUEST_EXECUTOR_MAX_CONNECTIONS_PER_ROUTE_PROPERTY_NAME = "okta.client.requestExecutor.maxPerRoute";
+    private static final String DEFAULT_REQUEST_EXECUTOR_MAX_CONNECTIONS_TOTAL_PROPERTY_NAME = "okta.client.requestExecutor.maxTotal";
+    private static final String DEFAULT_REQUEST_EXECUTOR_CONNECTION_VALIDATION_PROPERTY_NAME = "okta.client.requestExecutor.validateAfterInactivity";
+    private static final String DEFAULT_REQUEST_EXECUTOR_CONNECTION_TIME_TO_LIVE_PROPERTY_NAME = "okta.client.requestExecutor.timeToLive";
+
+    private static final int DEFAULT_MAX_CONNECTIONS_PER_ROUTE = Integer.MAX_VALUE/2;
+    private static final int DEFAULT_MAX_CONNECTIONS_TOTAL = Integer.MAX_VALUE;
+    private static final int DEFAULT_CONNECTION_VALIDATION_INACTIVITY = 2000; // 2sec
+    private static final int DEFAULT_CONNECTION_TIME_TO_LIVE = 5 * 1000 * 60; // 5 minutes
+
     private final RequestAuthenticator requestAuthenticator;
 
     private HttpClient httpClient;
 
     private HttpClientRequestFactory httpClientRequestFactory;
+
+    private final Map<String, String> requestExecutorParams = new HashMap<>();
 
     @SuppressWarnings({"deprecation"})
     public HttpClientRequestExecutor(HttpClientConfiguration clientConfiguration) {
@@ -86,25 +105,24 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
         this.requestAuthenticator = clientConfiguration.getRequestAuthenticator();
 
-        PoolingHttpClientConnectionManager connMgr = new PoolingHttpClientConnectionManager(clientConfiguration.getConnectionTimeToLive(), TimeUnit.MILLISECONDS);
-        connMgr.setValidateAfterInactivity(clientConfiguration.getMaxConnectionInactivity());
+        parseRequestExecutorParamConfigs(clientConfiguration.getRequestExecutorParams());
 
-        if (clientConfiguration.getMaxConnectionTotal() >= clientConfiguration.getMaxConnectionPerRoute()) {
-            connMgr.setDefaultMaxPerRoute(clientConfiguration.getMaxConnectionPerRoute());
-            connMgr.setMaxTotal(clientConfiguration.getMaxConnectionTotal());
+        PoolingHttpClientConnectionManager connMgr = new PoolingHttpClientConnectionManager(getConnectionTimeToLive(), TimeUnit.MILLISECONDS);
+        connMgr.setValidateAfterInactivity(getMaxConnectionInactivity());
+
+        if (getMaxConnectionTotal() >= getMaxConnectionPerRoute()) {
+            connMgr.setDefaultMaxPerRoute(getMaxConnectionPerRoute());
+            connMgr.setMaxTotal(getMaxConnectionTotal());
         } else {
-            connMgr.setDefaultMaxPerRoute(HttpClientConfiguration.DEFAULT_MAX_CONNECTIONS_PER_ROUTE);
-            connMgr.setMaxTotal(HttpClientConfiguration.DEFAULT_MAX_CONNECTIONS_TOTAL);
+            connMgr.setDefaultMaxPerRoute(DEFAULT_MAX_CONNECTIONS_PER_ROUTE);
+            connMgr.setMaxTotal(DEFAULT_MAX_CONNECTIONS_TOTAL);
 
             log.warn(
                 "{} ({}) is less than {} ({}). " +
                 "Reverting to defaults: connectionMaxTotal ({}) and connectionMaxPerRoute ({}).",
-                HttpClientConfiguration.MAX_CONNECTIONS_TOTAL_PROPERTY_KEY,
-                clientConfiguration.getMaxConnectionTotal(),
-                HttpClientConfiguration.MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY,
-                clientConfiguration.getMaxConnectionPerRoute(),
-                HttpClientConfiguration.DEFAULT_MAX_CONNECTIONS_TOTAL,
-                HttpClientConfiguration.DEFAULT_MAX_CONNECTIONS_PER_ROUTE
+                MAX_CONNECTIONS_TOTAL_PROPERTY_KEY, getMaxConnectionTotal(),
+                MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY, getMaxConnectionPerRoute(),
+                DEFAULT_MAX_CONNECTIONS_TOTAL, DEFAULT_MAX_CONNECTIONS_PER_ROUTE
             );
         }
 
@@ -240,5 +258,116 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         }
 
         return headers;
+    }
+
+    private int getRequestExecutorParam(String key, String warning, int defaultValue) {
+        String configuredValueString = this.requestExecutorParams.get(key);
+        try {
+            if (configuredValueString != null) {
+                return Integer.parseInt(configuredValueString);
+            }
+        } catch (NumberFormatException nfe) {
+            log.warn("{}: {}. Using default: {}.",
+                warning,
+                configuredValueString,
+                defaultValue,
+                nfe);
+        }
+        return defaultValue;
+    }
+
+    public int getMaxConnectionPerRoute() {
+        return getRequestExecutorParam(
+            "maxPerRoute",
+            "Bad max connection per route value",
+            DEFAULT_MAX_CONNECTIONS_PER_ROUTE
+        );
+    }
+
+    public int getMaxConnectionTotal() {
+        return getRequestExecutorParam(
+            "maxTotal",
+            "Bad max connection total value",
+            DEFAULT_MAX_CONNECTIONS_TOTAL
+        );
+    }
+
+    public int getMaxConnectionInactivity() {
+        return getRequestExecutorParam(
+            "validateAfterInactivity",
+            "Invalid max connection inactivity validation value",
+            DEFAULT_CONNECTION_VALIDATION_INACTIVITY
+        );
+    }
+
+    public int getConnectionTimeToLive() {
+        return getRequestExecutorParam(
+            "timeToLive",
+            "Invalid connection time to live value",
+            DEFAULT_CONNECTION_TIME_TO_LIVE
+        );
+    }
+
+    private void parseRequestExecutorParamConfigs(Map<String, String> props) {
+
+        String maxPerRoute = lookupConfigValue(
+            props,
+            DEFAULT_REQUEST_EXECUTOR_MAX_CONNECTIONS_PER_ROUTE_PROPERTY_NAME,
+            MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY);
+        if(maxPerRoute != null) {
+            this.requestExecutorParams.put("maxPerRoute", maxPerRoute);
+        }
+
+        String maxTotal = lookupConfigValue(
+            props,
+            DEFAULT_REQUEST_EXECUTOR_MAX_CONNECTIONS_TOTAL_PROPERTY_NAME,
+            MAX_CONNECTIONS_TOTAL_PROPERTY_KEY);
+        if(maxTotal != null) {
+            requestExecutorParams.put("maxTotal", maxTotal);
+        }
+
+        String validateAfterInactivity = lookupConfigValue(
+            props,
+            DEFAULT_REQUEST_EXECUTOR_CONNECTION_VALIDATION_PROPERTY_NAME,
+            CONNECTION_VALIDATION_PROPERTY_KEY);
+        if(validateAfterInactivity != null) {
+            requestExecutorParams.put("validateAfterInactivity", validateAfterInactivity);
+        }
+
+        String timeToLive = lookupConfigValue(
+            props,
+            DEFAULT_REQUEST_EXECUTOR_CONNECTION_TIME_TO_LIVE_PROPERTY_NAME,
+            CONNECTION_TIME_TO_LIVE_PROPERTY_KEY);
+        if(maxPerRoute != null) {
+            requestExecutorParams.put("timeToLive", timeToLive);
+        }
+    }
+
+    private String lookupConfigValue(Map<String, String> props, String key, String sysPropName) {
+
+        String configuredValue = props.get(key);
+        if (configuredValue != null) {
+            return configuredValue;
+        }
+
+        String[] arr = key.split("\\.");
+        if(arr.length > 0) {
+            String shortKeyNew = String.join(".", arr[arr.length - 1]);
+            for (String prop : props.keySet()) {
+                if (prop.endsWith(shortKeyNew)) {
+                    configuredValue = props.get(prop);
+                    if (configuredValue != null) {
+                        return configuredValue;
+                    }
+                }
+            }
+        }
+
+        configuredValue = props.get(sysPropName);
+        if (configuredValue != null) {
+            return configuredValue;
+        }
+
+        return configuredValue;
     }
 }

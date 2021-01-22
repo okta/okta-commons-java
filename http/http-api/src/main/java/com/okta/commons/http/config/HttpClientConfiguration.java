@@ -17,8 +17,6 @@
 package com.okta.commons.http.config;
 
 import com.okta.commons.http.authc.RequestAuthenticator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,8 +29,6 @@ import java.util.Map;
  */
 public class HttpClientConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(HttpClientConfiguration.class);
-
     private String baseUrl;
     private int connectionTimeout;
     private RequestAuthenticator requestAuthenticator;
@@ -44,16 +40,6 @@ public class HttpClientConfiguration {
     private int retryMaxElapsed = 0;
     private int retryMaxAttempts = 0;
     private final Map<String, String> requestExecutorParams = new HashMap<>();
-
-    public static final int DEFAULT_MAX_CONNECTIONS_PER_ROUTE = Integer.MAX_VALUE/2;
-    public static final int DEFAULT_MAX_CONNECTIONS_TOTAL = Integer.MAX_VALUE;
-    public static final int DEFAULT_CONNECTION_VALIDATION_INACTIVITY = 2000; // 2sec
-    public static final int DEFAULT_CONNECTION_TIME_TO_LIVE = 5 * 1000 * 60; // 5 minutes
-
-    public static final String MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxPerRoute";
-    public static final String MAX_CONNECTIONS_TOTAL_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxTotal";
-    public static final String CONNECTION_VALIDATION_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity";
-    public static final String CONNECTION_TIME_TO_LIVE_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive";
 
     public RequestAuthenticator getRequestAuthenticator() {
         return requestAuthenticator;
@@ -162,73 +148,23 @@ public class HttpClientConfiguration {
 
     public void setRequestExecutorParams(Map<String, String> map) {
         if (map != null) {
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                this.requestExecutorParams.put(entry.getKey(), entry.getValue());
-            }
+            this.requestExecutorParams.putAll(map);
         }
     }
 
-    public int getMaxConnectionPerRoute() {
-        return getRequestExecutorParam(
-            "maxPerRoute",
-            "Bad max connection per route value",
-            DEFAULT_MAX_CONNECTIONS_PER_ROUTE
-        );
-    }
-
-    public int getMaxConnectionTotal() {
-        return getRequestExecutorParam(
-            "maxTotal",
-            "Bad max connection total value",
-            DEFAULT_MAX_CONNECTIONS_TOTAL
-        );
-    }
-
-    public int getMaxConnectionInactivity() {
-        return getRequestExecutorParam(
-            "validateAfterInactivity",
-            "Invalid max connection inactivity validation value",
-            DEFAULT_CONNECTION_VALIDATION_INACTIVITY
-        );
-    }
-
-    public int getConnectionTimeToLive() {
-        return getRequestExecutorParam(
-            "timeToLive",
-            "Invalid connection time to live value",
-            DEFAULT_CONNECTION_TIME_TO_LIVE
-        );
-    }
-
-    public int getRequestExecutorParam(String key, String warning, int defaultValue) {
-        String configuredValueString = this.requestExecutorParams.get(key);
-        try {
-            if (configuredValueString != null) {
-                return Integer.parseInt(configuredValueString);
-            }
-        } catch (NumberFormatException nfe) {
-            log.warn("{}: {}. Using default: {}.",
-                warning,
-                configuredValueString,
-                defaultValue,
-                nfe);
-        }
-        return defaultValue;
+    public Map<String, String> getRequestExecutorParams() {
+        return this.requestExecutorParams;
     }
 
     @Override
     public String toString() {
         return "ClientConfiguration{" +
-                ", baseUrl='" + baseUrl + '\'' +
-                ", connectionTimeout=" + connectionTimeout +
-                ", requestAuthenticator=" + requestAuthenticator +
-                ", retryMaxElapsed=" + retryMaxElapsed +
-                ", retryMaxAttempts=" + retryMaxAttempts +
-                ", proxy=" + proxy +
-                ", maxPerRoute=" + getMaxConnectionPerRoute() +
-                ", maxTotal=" + getMaxConnectionTotal() +
-                ", validateAfterInactivity=" + getMaxConnectionInactivity() +
-                ", timeToLive=" + getConnectionTimeToLive() +
-                '}';
+            ", baseUrl='" + baseUrl + '\'' +
+            ", connectionTimeout=" + connectionTimeout +
+            ", requestAuthenticator=" + requestAuthenticator +
+            ", retryMaxElapsed=" + retryMaxElapsed +
+            ", retryMaxAttempts=" + retryMaxAttempts +
+            ", proxy=" + proxy +
+            '}';
     }
 }
