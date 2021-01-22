@@ -353,9 +353,9 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         String[] arr = key.split("\\.");
         if(arr.length > 0) {
             String shortKeyNew = String.join(".", arr[arr.length - 1]);
-            for (String prop : props.keySet()) {
-                if (prop.endsWith(shortKeyNew)) {
-                    configuredValue = props.get(prop);
+            for (Map.Entry<String, String> prop : props.entrySet()) {
+                if (prop.getKey().endsWith(shortKeyNew)) {
+                    configuredValue = prop.getValue();
                     if (configuredValue != null) {
                         return configuredValue;
                     }
