@@ -77,11 +77,6 @@ public class HttpClientRequestExecutor implements RequestExecutor {
     private static final String CONNECTION_VALIDATION_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity";
     private static final String CONNECTION_TIME_TO_LIVE_PROPERTY_KEY = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive";
 
-    private static final String DEFAULT_REQUEST_EXECUTOR_MAX_CONNECTIONS_PER_ROUTE_PROPERTY_NAME = "okta.client.requestExecutor.maxPerRoute";
-    private static final String DEFAULT_REQUEST_EXECUTOR_MAX_CONNECTIONS_TOTAL_PROPERTY_NAME = "okta.client.requestExecutor.maxTotal";
-    private static final String DEFAULT_REQUEST_EXECUTOR_CONNECTION_VALIDATION_PROPERTY_NAME = "okta.client.requestExecutor.validateAfterInactivity";
-    private static final String DEFAULT_REQUEST_EXECUTOR_CONNECTION_TIME_TO_LIVE_PROPERTY_NAME = "okta.client.requestExecutor.timeToLive";
-
     private static final int DEFAULT_MAX_CONNECTIONS_PER_ROUTE = Integer.MAX_VALUE/2;
     private static final int DEFAULT_MAX_CONNECTIONS_TOTAL = Integer.MAX_VALUE;
     private static final int DEFAULT_CONNECTION_VALIDATION_INACTIVITY = 2000; // 2sec
@@ -105,7 +100,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
         this.requestAuthenticator = clientConfiguration.getRequestAuthenticator();
 
-        parseRequestExecutorParamConfigs(clientConfiguration.getRequestExecutorParams());
+        parseRequestExecutorParams(clientConfiguration.getRequestExecutorParams());
 
         PoolingHttpClientConnectionManager connMgr = new PoolingHttpClientConnectionManager(getConnectionTimeToLive(), TimeUnit.MILLISECONDS);
         connMgr.setValidateAfterInactivity(getMaxConnectionInactivity());
@@ -267,7 +262,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
                 return Integer.parseInt(configuredValueString);
             }
         } catch (NumberFormatException nfe) {
-            log.warn("{}: {}. Using default: {}.",
+            log.warn("Failed to parse configuration property [{}: {}] falling back to default value: {}",
                 warning,
                 configuredValueString,
                 defaultValue,
@@ -276,23 +271,23 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         return defaultValue;
     }
 
-    public int getMaxConnectionPerRoute() {
+    int getMaxConnectionPerRoute() {
         return getRequestExecutorParam(
-            "maxPerRoute",
+            "maxConnectionsPerRoute",
             "Bad max connection per route value",
             DEFAULT_MAX_CONNECTIONS_PER_ROUTE
         );
     }
 
-    public int getMaxConnectionTotal() {
+    int getMaxConnectionTotal() {
         return getRequestExecutorParam(
-            "maxTotal",
+            "maxConnectionsTotal",
             "Bad max connection total value",
             DEFAULT_MAX_CONNECTIONS_TOTAL
         );
     }
 
-    public int getMaxConnectionInactivity() {
+    int getMaxConnectionInactivity() {
         return getRequestExecutorParam(
             "validateAfterInactivity",
             "Invalid max connection inactivity validation value",
@@ -300,7 +295,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         );
     }
 
-    public int getConnectionTimeToLive() {
+    int getConnectionTimeToLive() {
         return getRequestExecutorParam(
             "timeToLive",
             "Invalid connection time to live value",
@@ -308,27 +303,27 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         );
     }
 
-    private void parseRequestExecutorParamConfigs(Map<String, String> props) {
+    private void parseRequestExecutorParams(Map<String, String> props) {
 
         String maxPerRoute = lookupConfigValue(
             props,
-            DEFAULT_REQUEST_EXECUTOR_MAX_CONNECTIONS_PER_ROUTE_PROPERTY_NAME,
+            "maxConnectionsPerRoute",
             MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY);
         if(maxPerRoute != null) {
-            this.requestExecutorParams.put("maxPerRoute", maxPerRoute);
+            this.requestExecutorParams.put("maxConnectionsPerRoute", maxPerRoute);
         }
 
         String maxTotal = lookupConfigValue(
             props,
-            DEFAULT_REQUEST_EXECUTOR_MAX_CONNECTIONS_TOTAL_PROPERTY_NAME,
+            "maxConnectionsTotal",
             MAX_CONNECTIONS_TOTAL_PROPERTY_KEY);
         if(maxTotal != null) {
-            requestExecutorParams.put("maxTotal", maxTotal);
+            requestExecutorParams.put("maxConnectionsTotal", maxTotal);
         }
 
         String validateAfterInactivity = lookupConfigValue(
             props,
-            DEFAULT_REQUEST_EXECUTOR_CONNECTION_VALIDATION_PROPERTY_NAME,
+            "validateAfterInactivity",
             CONNECTION_VALIDATION_PROPERTY_KEY);
         if(validateAfterInactivity != null) {
             requestExecutorParams.put("validateAfterInactivity", validateAfterInactivity);
@@ -336,9 +331,9 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
         String timeToLive = lookupConfigValue(
             props,
-            DEFAULT_REQUEST_EXECUTOR_CONNECTION_TIME_TO_LIVE_PROPERTY_NAME,
+            "timeToLive",
             CONNECTION_TIME_TO_LIVE_PROPERTY_KEY);
-        if(maxPerRoute != null) {
+        if(timeToLive != null) {
             requestExecutorParams.put("timeToLive", timeToLive);
         }
     }
@@ -350,24 +345,13 @@ public class HttpClientRequestExecutor implements RequestExecutor {
             return configuredValue;
         }
 
-        String[] arr = key.split("\\.");
-        if(arr.length > 0) {
-            String shortKeyNew = String.join(".", arr[arr.length - 1]);
-            for (Map.Entry<String, String> prop : props.entrySet()) {
-                if (prop.getKey().endsWith(shortKeyNew)) {
-                    configuredValue = prop.getValue();
-                    if (configuredValue != null) {
-                        return configuredValue;
-                    }
-                }
-            }
+        try {
+            configuredValue = System.getProperty(sysPropName);
+        } catch (SecurityException e) {
+            log.warn("Failed to get system property [{}]. {}",
+                sysPropName,
+                e);
         }
-
-        configuredValue = props.get(sysPropName);
-        if (configuredValue != null) {
-            return configuredValue;
-        }
-
         return configuredValue;
     }
 }

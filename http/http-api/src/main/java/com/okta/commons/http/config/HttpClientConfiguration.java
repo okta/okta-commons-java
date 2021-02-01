@@ -159,12 +159,12 @@ public class HttpClientConfiguration {
     @Override
     public String toString() {
         return "ClientConfiguration{" +
-            ", baseUrl='" + baseUrl + '\'' +
-            ", connectionTimeout=" + connectionTimeout +
-            ", requestAuthenticator=" + requestAuthenticator +
-            ", retryMaxElapsed=" + retryMaxElapsed +
-            ", retryMaxAttempts=" + retryMaxAttempts +
-            ", proxy=" + proxy +
-            '}';
+                ", baseUrl='" + baseUrl + '\'' +
+                ", connectionTimeout=" + connectionTimeout +
+                ", requestAuthenticator=" + requestAuthenticator +
+                ", retryMaxElapsed=" + retryMaxElapsed +
+                ", retryMaxAttempts=" + retryMaxAttempts +
+                ", proxy=" + proxy +
+                '}';
     }
 }

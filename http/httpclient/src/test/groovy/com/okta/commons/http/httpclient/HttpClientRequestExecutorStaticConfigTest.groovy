@@ -29,8 +29,7 @@ import static org.hamcrest.Matchers.is
 
 class HttpClientRequestExecutorStaticConfigTest implements IHookable {
 
-    //Temporary disabled
-    //@Test(dataProvider = "validateAfterInactivity")
+    @Test(dataProvider = "validateAfterInactivity")
     void validateAfterInactivityIsEmpty(String configValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity"
         if (configValue != null) {
@@ -40,8 +39,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
         assertThat requestExecutor.getMaxConnectionInactivity(), is(expectedValue)
     }
 
-    //Temporary disabled
-    //@Test(dataProvider = "timeToLive")
+    @Test(dataProvider = "timeToLive")
     void timeToLive(String configValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive"
         if (configValue != null) {
@@ -51,8 +49,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
         assertThat requestExecutor.getConnectionTimeToLive(), is(expectedValue)
     }
 
-    //Temporary disabled
-    //@Test(dataProvider = "maxConnections")
+    @Test(dataProvider = "maxConnections")
     void maxConnections(String configValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxTotal"
         if (configValue != null) {
@@ -62,8 +59,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
         assertThat requestExecutor.getMaxConnectionTotal(), is(expectedValue)
     }
 
-    //Temporary disabled
-    //@Test(dataProvider = "maxConnectionsPerRoute")
+    @Test(dataProvider = "maxConnectionsPerRoute")
     void maxConnectionsPerRoute(String configValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxPerRoute"
         if (configValue != null) {
@@ -80,7 +76,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
                 return null
             }
         }
-        return e;
+        return e
     }
 
     @DataProvider
