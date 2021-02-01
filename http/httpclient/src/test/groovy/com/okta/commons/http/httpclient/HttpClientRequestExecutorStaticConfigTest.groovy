@@ -17,6 +17,7 @@ package com.okta.commons.http.httpclient
 
 import com.okta.commons.http.config.HttpClientConfiguration
 import org.apache.http.HttpEntity
+import org.testng.Assert
 import org.testng.IHookCallBack
 import org.testng.IHookable
 import org.testng.ITestResult
@@ -65,8 +66,13 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }
-        def requestExecutor = loadHttpClientRequestExecutor()
-        assertThat requestExecutor.getMaxConnectionPerRoute(), is(expectedValue)
+        if(configValue == "0" || configValue == "-1") {
+            def exception = expect(IllegalArgumentException, {loadHttpClientRequestExecutor()})
+            assertThat exception.getMessage(), is("Max per route value may not be negative or zero")
+        } else {
+            def requestExecutor = loadHttpClientRequestExecutor()
+            assertThat requestExecutor.getMaxConnectionPerRoute(), is(expectedValue)
+        }
     }
 
     HttpClientRequestExecutor loadHttpClientRequestExecutor() {
@@ -109,6 +115,18 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
                ["12", 12],
                [null, defaultValue]
         ]
+    }
+
+    static <T extends Throwable> T expect(Class<T> catchMe, Closure closure) {
+        try {
+            closure.call()
+            Assert.fail("Expected ${catchMe.getName()} to be thrown.")
+        } catch(e) {
+            if (!e.class.isAssignableFrom(catchMe)) {
+                throw e
+            }
+            return e
+        }
     }
 
     @Override
