@@ -88,7 +88,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
     private HttpClientRequestFactory httpClientRequestFactory;
 
-    private final Map<String, String> requestExecutorParams = new HashMap<>();
+    private final Map<String, Integer> requestExecutorParams = new HashMap<>();
 
     @SuppressWarnings({"deprecation"})
     public HttpClientRequestExecutor(HttpClientConfiguration clientConfiguration) {
@@ -256,18 +256,11 @@ public class HttpClientRequestExecutor implements RequestExecutor {
     }
 
     private int getRequestExecutorParam(String key, String warning, int defaultValue) {
-        String configuredValueString = this.requestExecutorParams.get(key);
-        try {
-            if (configuredValueString != null) {
-                return Integer.parseInt(configuredValueString);
-            }
-        } catch (NumberFormatException nfe) {
-            log.warn("Failed to parse configuration property [{}: {}] falling back to default value: {}",
-                warning,
-                configuredValueString,
-                defaultValue,
-                nfe);
+        Integer configuredValue = this.requestExecutorParams.get(key);
+        if (configuredValue != null) {
+            return configuredValue;
         }
+        log.warn("Failed to read configuration property [{}]. Falling back to default value: {}", key, defaultValue);
         return defaultValue;
     }
 
@@ -305,7 +298,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
     private void parseRequestExecutorParams(Map<String, String> props) {
 
-        String maxPerRoute = lookupConfigValue(
+        Integer maxPerRoute = lookupConfigValue(
             props,
             "maxConnectionsPerRoute",
             MAX_CONNECTIONS_PER_ROUTE_PROPERTY_KEY);
@@ -313,7 +306,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
             this.requestExecutorParams.put("maxConnectionsPerRoute", maxPerRoute);
         }
 
-        String maxTotal = lookupConfigValue(
+        Integer maxTotal = lookupConfigValue(
             props,
             "maxConnectionsTotal",
             MAX_CONNECTIONS_TOTAL_PROPERTY_KEY);
@@ -321,7 +314,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
             requestExecutorParams.put("maxConnectionsTotal", maxTotal);
         }
 
-        String validateAfterInactivity = lookupConfigValue(
+        Integer validateAfterInactivity = lookupConfigValue(
             props,
             "validateAfterInactivity",
             CONNECTION_VALIDATION_PROPERTY_KEY);
@@ -329,7 +322,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
             requestExecutorParams.put("validateAfterInactivity", validateAfterInactivity);
         }
 
-        String timeToLive = lookupConfigValue(
+        Integer timeToLive = lookupConfigValue(
             props,
             "timeToLive",
             CONNECTION_TIME_TO_LIVE_PROPERTY_KEY);
@@ -338,20 +331,22 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         }
     }
 
-    private String lookupConfigValue(Map<String, String> props, String key, String sysPropName) {
+    private Integer lookupConfigValue(Map<String, String> props, String key, String sysPropName) {
 
-        String configuredValue = props.get(key);
-        if (configuredValue != null) {
-            return configuredValue;
+        try {
+            String configuredValue = props.get(key);
+            return Integer.parseInt(configuredValue);
+        } catch (NumberFormatException e) {
+            log.warn("Failed to parse configuration property [{}]", key, e);
         }
 
         try {
-            configuredValue = System.getProperty(sysPropName);
-        } catch (SecurityException e) {
-            log.warn("Failed to get system property [{}]. {}",
-                sysPropName,
-                e);
+            String configuredValue = System.getProperty(sysPropName);
+            return Integer.parseInt(configuredValue);
+        } catch (SecurityException | NumberFormatException e) {
+            log.warn("Failed to parse system property [{}]", sysPropName, e);
         }
-        return configuredValue;
+
+        return null;
     }
 }
