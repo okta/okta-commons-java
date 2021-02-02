@@ -260,7 +260,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         if (configuredValue != null) {
             return configuredValue;
         }
-        log.warn("Failed to read configuration property [{}]. Falling back to default value: {}", key, defaultValue);
+        log.warn("Failed to read configuration property [{}: {}]. Falling back to default value: {}", key, warning, defaultValue);
         return defaultValue;
     }
 
@@ -335,7 +335,6 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
         try {
             String configuredValue = props.get(key);
-            log.info("[{}: {}]", key, configuredValue);
             return Integer.parseInt(configuredValue);
         } catch (NumberFormatException e) {
             log.warn("Failed to parse configuration property [{}]", key, e);
@@ -343,7 +342,6 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
         try {
             String configuredValue = System.getProperty(sysPropName);
-            log.info("[{}: {}]", sysPropName, configuredValue);
             return Integer.parseInt(configuredValue);
         } catch (SecurityException | NumberFormatException e) {
             log.warn("Failed to parse system property [{}]", sysPropName, e);
