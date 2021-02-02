@@ -337,14 +337,14 @@ public class HttpClientRequestExecutor implements RequestExecutor {
             String configuredValue = props.get(key);
             return Integer.parseInt(configuredValue);
         } catch (NumberFormatException e) {
-            log.warn("Failed to parse configuration property [{}]", key, e);
+            log.warn("Failed to parse configuration property [{}]", key);
         }
 
         try {
             String configuredValue = System.getProperty(sysPropName);
             return Integer.parseInt(configuredValue);
         } catch (SecurityException | NumberFormatException e) {
-            log.warn("Failed to parse system property [{}]", sysPropName, e);
+            log.warn("Failed to parse system property [{}]", sysPropName);
         }
 
         return null;
