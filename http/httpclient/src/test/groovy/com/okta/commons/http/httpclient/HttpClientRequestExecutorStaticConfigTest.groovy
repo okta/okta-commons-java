@@ -74,7 +74,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
         }
     }
 
-    @Test(dataProvider = "validateAfterInactivityParams", enabled = false)
+    @Test(dataProvider = "validateAfterInactivityParams")
     void validateAfterInactivitySysPropAndParams(String paramValue, String sysPropValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity"
         if(sysPropValue != null) {
@@ -84,7 +84,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
         assertThat reqExec.getMaxConnectionInactivity(), is(expectedValue)
     }
 
-    @Test(dataProvider = "timeToLiveParams", enabled = false)
+    @Test(dataProvider = "timeToLiveParams")
     void timeToLiveSysPropAndParams(String paramValue, String sysPropValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive"
         if(sysPropValue != null) {
@@ -94,7 +94,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
         assertThat reqExec.getConnectionTimeToLive(), is(expectedValue)
     }
 
-    @Test(dataProvider = "maxConnectionsTotalParams", enabled = false)
+    @Test(dataProvider = "maxConnectionsTotalParams")
     void maxConnectionsSysPropAndParams(String paramValue, String sysPropValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxTotal"
         if(sysPropValue != null) {
@@ -104,7 +104,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
         assertThat reqExec.getMaxConnectionTotal(), is(expectedValue)
     }
 
-    @Test(dataProvider = "maxConnectionsPerRouteParams", enabled = false)
+    @Test(dataProvider = "maxConnectionsPerRouteParams")
     void maxConnectionsPerRouteSysPropAndParams(String paramValue, String sysPropValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxPerRoute"
         if (sysPropValue != null) {
