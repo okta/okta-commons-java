@@ -18,6 +18,9 @@ package com.okta.commons.http.config;
 
 import com.okta.commons.http.authc.RequestAuthenticator;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * This class holds the configuration properties use to construct a {@link com.okta.commons.http.RequestExecutor RequestExecutor}.
@@ -36,6 +39,7 @@ public class HttpClientConfiguration {
     private Proxy proxy;
     private int retryMaxElapsed = 0;
     private int retryMaxAttempts = 0;
+    private final Map<String, String> requestExecutorParams = new HashMap<>();
 
     public RequestAuthenticator getRequestAuthenticator() {
         return requestAuthenticator;
@@ -44,6 +48,7 @@ public class HttpClientConfiguration {
     public void setRequestAuthenticator(RequestAuthenticator requestAuthenticator) {
         this.requestAuthenticator = requestAuthenticator;
     }
+
     public String getBaseUrl() {
         return baseUrl;
     }
@@ -139,6 +144,14 @@ public class HttpClientConfiguration {
     public HttpClientConfiguration setRetryMaxAttempts(int retryMaxAttempts) {
         this.retryMaxAttempts = retryMaxAttempts;
         return this;
+    }
+
+    public void setRequestExecutorParams(Map<String, String> map) {
+        this.requestExecutorParams.putAll(map);
+    }
+
+    public Map<String, String> getRequestExecutorParams() {
+        return this.requestExecutorParams;
     }
 
     @Override

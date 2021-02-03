@@ -34,13 +34,11 @@ import org.apache.http.StatusLine
 import org.apache.http.client.HttpClient
 import org.apache.http.client.methods.HttpRequestBase
 import org.apache.http.conn.ConnectTimeoutException
-import org.apache.http.message.BasicHeader
 import org.testng.Assert
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 
 import java.nio.charset.StandardCharsets
-import java.text.SimpleDateFormat
 import java.time.Duration
 
 import static org.hamcrest.MatcherAssert.assertThat

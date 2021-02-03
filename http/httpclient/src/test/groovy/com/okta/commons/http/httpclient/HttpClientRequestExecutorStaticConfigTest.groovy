@@ -15,6 +15,8 @@
  */
 package com.okta.commons.http.httpclient
 
+import com.okta.commons.http.config.HttpClientConfiguration
+import org.testng.Assert
 import org.testng.IHookCallBack
 import org.testng.IHookable
 import org.testng.ITestResult
@@ -27,45 +29,112 @@ import static org.hamcrest.Matchers.is
 
 class HttpClientRequestExecutorStaticConfigTest implements IHookable {
 
-    private static final String REQUEST_EXECUTOR_CLASSNAME = "com.okta.commons.http.httpclient.HttpClientRequestExecutor"
-
     @Test(dataProvider = "validateAfterInactivity")
-    void validateAfterInactivityIsEmpty(String configValue, int expectedValue) {
+    void validateAfterInactivitySysPropOnly(String configValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity"
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }
-        def requestExecutor = isolatedClassLoader().loadClass(REQUEST_EXECUTOR_CLASSNAME)
-        assertThat requestExecutor.CONNECTION_VALIDATION_INACTIVITY, is(expectedValue)
+        def requestExecutor = loadHttpClientRequestExecutor()
+        assertThat requestExecutor.getMaxConnectionInactivity(), is(expectedValue)
     }
+
     @Test(dataProvider = "timeToLive")
-    void timeToLive(String configValue, int expectedValue) {
+    void timeToLiveSysPropOnly(String configValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive"
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }
-        def requestExecutor = isolatedClassLoader().loadClass(REQUEST_EXECUTOR_CLASSNAME)
-        assertThat requestExecutor.CONNECTION_TIME_TO_LIVE, is(expectedValue)
+        def requestExecutor = loadHttpClientRequestExecutor()
+        assertThat requestExecutor.getConnectionTimeToLive(), is(expectedValue)
     }
 
     @Test(dataProvider = "maxConnections")
-    void maxConnections(String configValue, int expectedValue) {
+    void maxConnectionsSysPropOnly(String configValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxTotal"
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }
-        def requestExecutor = isolatedClassLoader().loadClass(REQUEST_EXECUTOR_CLASSNAME)
-        assertThat requestExecutor.MAX_CONNECTIONS_TOTAL, is(expectedValue)
+        def requestExecutor = loadHttpClientRequestExecutor()
+        assertThat requestExecutor.getMaxConnectionTotal(), is(expectedValue)
     }
 
     @Test(dataProvider = "maxConnectionsPerRoute")
-    void maxConnectionsPerRoute(String configValue, int expectedValue) {
+    void maxConnectionsPerRouteSysPropOnly(String configValue, int expectedValue) {
         def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxPerRoute"
         if (configValue != null) {
             System.properties.setProperty(prop, configValue)
         }
-        def requestExecutor = isolatedClassLoader().loadClass(REQUEST_EXECUTOR_CLASSNAME)
-        assertThat requestExecutor.MAX_CONNECTIONS_PER_ROUTE, is(expectedValue)
+        if(configValue == "0" || configValue == "-1") {
+            def exception = expect(IllegalArgumentException, {loadHttpClientRequestExecutor()})
+            assertThat exception.getMessage(), is("Max per route value may not be negative or zero")
+        } else {
+            def requestExecutor = loadHttpClientRequestExecutor()
+            assertThat requestExecutor.getMaxConnectionPerRoute(), is(expectedValue)
+        }
+    }
+
+    @Test(dataProvider = "validateAfterInactivityParams")
+    void validateAfterInactivitySysPropAndParams(String paramValue, String sysPropValue, int expectedValue) {
+        def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.validateAfterInactivity"
+        if(sysPropValue != null) {
+            System.properties.setProperty(prop, sysPropValue)
+        }
+        def reqExec = buildHttpClientRequestExecutorWithParams("validateAfterInactivity", paramValue)
+        assertThat reqExec.getMaxConnectionInactivity(), is(expectedValue)
+    }
+
+    @Test(dataProvider = "timeToLiveParams")
+    void timeToLiveSysPropAndParams(String paramValue, String sysPropValue, int expectedValue) {
+        def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.timeToLive"
+        if(sysPropValue != null) {
+            System.properties.setProperty(prop, sysPropValue)
+        }
+        def reqExec = buildHttpClientRequestExecutorWithParams("connectionTimeToLive", paramValue)
+        assertThat reqExec.getConnectionTimeToLive(), is(expectedValue)
+    }
+
+    @Test(dataProvider = "maxConnectionsTotalParams")
+    void maxConnectionsSysPropAndParams(String paramValue, String sysPropValue, int expectedValue) {
+        def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxTotal"
+        if(sysPropValue != null) {
+            System.properties.setProperty(prop, sysPropValue)
+        }
+        def reqExec = buildHttpClientRequestExecutorWithParams("maxConnectionsTotal", paramValue)
+        assertThat reqExec.getMaxConnectionTotal(), is(expectedValue)
+    }
+
+    @Test(dataProvider = "maxConnectionsPerRouteParams")
+    void maxConnectionsPerRouteSysPropAndParams(String paramValue, String sysPropValue, int expectedValue) {
+        def prop = "com.okta.sdk.impl.http.httpclient.HttpClientRequestExecutor.connPoolControl.maxPerRoute"
+        if (sysPropValue != null) {
+            System.properties.setProperty(prop, sysPropValue)
+        }
+        if((paramValue == "0" || paramValue == "-1") || (sysPropValue == "0" || sysPropValue == "-1")) {
+            def exception = expect(IllegalArgumentException, {
+                buildHttpClientRequestExecutorWithParams("maxConnectionsPerRoute", paramValue)
+            })
+            assertThat exception.getMessage(), is("Max per route value may not be negative or zero")
+        } else {
+            def reqExec = buildHttpClientRequestExecutorWithParams("maxConnectionsPerRoute", paramValue)
+            assertThat reqExec.getMaxConnectionPerRoute(), is(expectedValue)
+        }
+    }
+
+    HttpClientRequestExecutor loadHttpClientRequestExecutor() {
+        def e = new HttpClientRequestExecutor(new HttpClientConfiguration())
+        return e
+    }
+
+    HttpClientRequestExecutor buildHttpClientRequestExecutorWithParams(String paramKey, String paramValue) {
+        Map <String, String> requestExecutorParams = new HashMap<>()
+        requestExecutorParams.put(paramKey, paramValue)
+
+        def httpClientConfiguration = new HttpClientConfiguration()
+        httpClientConfiguration.setRequestExecutorParams(requestExecutorParams)
+
+        def httpClientRequestExecutor = new HttpClientRequestExecutor(httpClientConfiguration)
+        return httpClientRequestExecutor
     }
 
     @DataProvider
@@ -100,10 +169,70 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
         ]
     }
 
-    static ClassLoader isolatedClassLoader() {
-        def originalClassLoader = Thread.currentThread().getContextClassLoader()
-        URLClassLoader oldClassLoader = (URLClassLoader) originalClassLoader
-        return new URLClassLoader(oldClassLoader.getURLs(), (ClassLoader) null)
+    @DataProvider
+    Object[][] validateAfterInactivityParams() {
+        return advancedConfigTests(2000)
+    }
+
+    @DataProvider
+    Object[][] timeToLiveParams() {
+        return advancedConfigTests(300000)
+    }
+
+    @DataProvider
+    Object[][] maxConnectionsTotalParams() {
+        return advancedConfigTests(Integer.MAX_VALUE)
+    }
+
+    @DataProvider
+    Object[][] maxConnectionsPerRouteParams() {
+        return advancedConfigTests(Integer.MAX_VALUE/2 as int)
+    }
+
+    static Object[][] advancedConfigTests(int defaultValue) {
+        return [
+            //valid params + valid sysprops
+            ["2500", "3500", 2500],
+            ["12", "3500",  12],
+            ["0", "3500", 0],
+            ["-1", "3500", -1],
+
+            //invalid params + valid sysprops
+            ["😊", "3500", 3500],
+            ["Integer Value", "3500", 3500],
+            [null, "3500", 3500],
+            ["", "3500", 3500],
+            ["3.14,15", "3500", 3500],
+            ["3.14,15", "0", 0],
+            ["3.14,15", "-1", -1],
+
+            //invalid params + invalid sysprops
+            [null, null, defaultValue],
+            ["", null, defaultValue],
+            ["", "", defaultValue],
+            ["😊", "😁", defaultValue],
+            ["3,1415", "612,12", defaultValue],
+            ["Double Value", "Integer Value", defaultValue],
+
+            //valid params + invalid sysprops
+            ["2500", null, 2500],
+            ["2501", "", 2501],
+            ["2502", "😁", 2502],
+            ["2503", "612,12", 2503],
+            ["2504", "Integer Value", 2504]
+        ]
+    }
+
+    static <T extends Throwable> T expect(Class<T> catchMe, Closure closure) {
+        try {
+            closure.call()
+            Assert.fail("Expected ${catchMe.getName()} to be thrown.")
+        } catch(e) {
+            if (!e.class.isAssignableFrom(catchMe)) {
+                throw e
+            }
+            return e
+        }
     }
 
     @Override
