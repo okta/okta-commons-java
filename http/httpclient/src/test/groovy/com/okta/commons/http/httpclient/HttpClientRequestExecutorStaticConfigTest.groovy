@@ -90,7 +90,7 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
         if(sysPropValue != null) {
             System.properties.setProperty(prop, sysPropValue)
         }
-        def reqExec = buildHttpClientRequestExecutorWithParams("timeToLive", paramValue)
+        def reqExec = buildHttpClientRequestExecutorWithParams("connectionTimeToLive", paramValue)
         assertThat reqExec.getConnectionTimeToLive(), is(expectedValue)
     }
 

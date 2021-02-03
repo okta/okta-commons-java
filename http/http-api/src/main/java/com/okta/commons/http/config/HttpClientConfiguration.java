@@ -147,9 +147,7 @@ public class HttpClientConfiguration {
     }
 
     public void setRequestExecutorParams(Map<String, String> map) {
-        if (map != null) {
-            this.requestExecutorParams.putAll(map);
-        }
+        this.requestExecutorParams.putAll(map);
     }
 
     public Map<String, String> getRequestExecutorParams() {

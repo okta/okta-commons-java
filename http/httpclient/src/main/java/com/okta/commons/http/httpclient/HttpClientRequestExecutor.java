@@ -290,7 +290,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
     int getConnectionTimeToLive() {
         return getRequestExecutorParam(
-            "timeToLive",
+            "connectionTimeToLive",
             "Invalid connection time to live value",
             DEFAULT_CONNECTION_TIME_TO_LIVE
         );
@@ -324,10 +324,10 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
         Integer timeToLive = lookupConfigValue(
             props,
-            "timeToLive",
+            "connectionTimeToLive",
             CONNECTION_TIME_TO_LIVE_PROPERTY_KEY);
         if(timeToLive != null) {
-            requestExecutorParams.put("timeToLive", timeToLive);
+            requestExecutorParams.put("connectionTimeToLive", timeToLive);
         }
     }
 
