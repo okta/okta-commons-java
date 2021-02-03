@@ -31,4 +31,11 @@
         <gav regex="true">^org\.slf4j:slf4j-api:.*$</gav>
         <cve>CVE-2018-8088</cve>
     </suppress>
+
+    <!-- pulled in by google auto-service dependency; used at build time only; we do not use the offending method com.google.common.io.Files.createTempDir -->
+    <suppress>
+        <notes><![CDATA[ file name: guava-27.0.1-jre.jar ]]></notes>
+        <gav regex="true">^com\.google\.guava:.*$</gav>
+        <cve>CVE-2020-8908</cve>
+    </suppress>
 </suppressions>
