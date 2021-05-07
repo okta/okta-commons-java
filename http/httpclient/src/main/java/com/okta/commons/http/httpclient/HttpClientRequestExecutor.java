@@ -27,6 +27,7 @@ import com.okta.commons.http.authc.RequestAuthenticator;
 import com.okta.commons.http.config.HttpClientConfiguration;
 import com.okta.commons.http.config.Proxy;
 import com.okta.commons.lang.Assert;
+import com.okta.commons.lang.Strings;
 import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
@@ -260,7 +261,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         if (configuredValue != null) {
             return configuredValue;
         }
-        log.warn("Failed to read configuration property [{}: {}]. Falling back to default value: {}", key, warning, defaultValue);
+        log.debug("Configuration property [{}: {}] not set, Falling back to default value: {}", key, warning, defaultValue);
         return defaultValue;
     }
 
@@ -332,21 +333,24 @@ public class HttpClientRequestExecutor implements RequestExecutor {
     }
 
     private Integer lookupConfigValue(Map<String, String> props, String key, String sysPropName) {
+        // check pops first
+        String configuredValue = props.get(key);
 
-        try {
-            String configuredValue = props.get(key);
-            return Integer.parseInt(configuredValue);
-        } catch (NumberFormatException e) {
-            log.warn("Failed to parse configuration property [{}]", key);
+        // if empty attempt to find system property
+        if (Strings.isEmpty(configuredValue)) {
+            configuredValue = System.getProperty(sysPropName);
         }
 
-        try {
-            String configuredValue = System.getProperty(sysPropName);
-            return Integer.parseInt(configuredValue);
-        } catch (SecurityException | NumberFormatException e) {
-            log.warn("Failed to parse system property [{}]", sysPropName);
+        // don't parse value if it's null or unset
+        if (!Strings.isEmpty(configuredValue)) {
+            try {
+                return Integer.parseInt(configuredValue);
+            } catch (NumberFormatException e) {
+                log.warn("Failed to parse configuration property [{}]", key);
+            }
         }
 
+        // no configuration value was found or could be parsed
         return null;
     }
 }
