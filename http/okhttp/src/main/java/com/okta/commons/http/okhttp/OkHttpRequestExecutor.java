@@ -198,8 +198,8 @@ public class OkHttpRequestExecutor implements RequestExecutor {
         }
 
         @Override
-        public long contentLength() {
-            return ((ByteArrayInputStream) inputStream).available();
+        public long contentLength() throws IOException {
+            return inputStream != null ? inputStream.available() : super.contentLength();
         }
     }
 }
