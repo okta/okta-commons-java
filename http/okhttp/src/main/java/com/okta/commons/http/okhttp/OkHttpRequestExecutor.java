@@ -196,5 +196,10 @@ public class OkHttpRequestExecutor implements RequestExecutor {
                 Util.closeQuietly(source);
             }
         }
+
+        @Override
+        public long contentLength() throws IOException {
+            return inputStream != null ? inputStream.available() : super.contentLength();
+        }
     }
 }

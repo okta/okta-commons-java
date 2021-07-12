@@ -184,6 +184,14 @@ class OkHttpRequestExecutorTest {
         verify(requestAuthenticator).authenticate(request)
     }
 
+    @Test
+    void testInputStreamRequestBodyContentLength() {
+        String content = "my-content"
+        InputStream body = new ByteArrayInputStream(content.getBytes())
+        def inputStreamRequestBody = new OkHttpRequestExecutor.InputStreamRequestBody(body, com.okta.commons.http.MediaType.TEXT_PLAIN)
+        assertThat(inputStreamRequestBody.contentLength(), is((long) content.length()))
+    }
+
     @DataProvider
     Object[][] retryableExceptions() {
         return [
