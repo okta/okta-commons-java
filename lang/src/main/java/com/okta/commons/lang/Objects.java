@@ -661,7 +661,7 @@ public abstract class Objects {
             return nullSafeToString((short[]) obj);
         }
         String str = obj.toString();
-        return (str != null ? str : EMPTY_STRING);
+        return (Strings.hasText(str) ? str : EMPTY_STRING);
     }
 
     /**

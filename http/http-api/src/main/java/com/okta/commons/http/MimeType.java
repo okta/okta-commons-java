@@ -422,7 +422,9 @@ public class MimeType implements Comparable<MimeType>, Serializable {
             return false;
         }
 
-        for (String key : this.parameters.keySet()) {
+        for (Map.Entry<String, String> entry : this.parameters.entrySet()) {
+            String key = entry.getKey();
+
             if (!other.parameters.containsKey(key)) {
                 return false;
             }
@@ -536,7 +538,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
     }
 
 
-    public static class SpecificityComparator<T extends MimeType> implements Comparator<T> {
+    public static class SpecificityComparator<T extends MimeType> implements Comparator<T>, Serializable {
 
         @Override
         public int compare(T mimeType1, T mimeType2) {
