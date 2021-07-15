@@ -20,7 +20,7 @@
     <parent>
         <groupId>com.okta</groupId>
         <artifactId>okta-parent</artifactId>
-        <version>20</version>
+        <version>21</version>
     </parent>
 
     <groupId>com.okta.commons</groupId>
@@ -35,7 +35,7 @@
 
     <properties>
         <github.slug>okta/okta-commons-java</github.slug>
-        <okta.commons.previousVersion>1.1.0</okta.commons.previousVersion>
+        <okta.commons.previousVersion>1.2.5</okta.commons.previousVersion>
     </properties>
 
     <modules>
