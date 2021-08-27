@@ -208,8 +208,16 @@ class OkHttpRequestExecutorTest {
         assertThat(inputStreamRequestBody.contentLength(), is((long) content.length()))
         inputStreamRequestBody.writeTo(buffer)
         assertThat(buffer.readUtf8(), is(content))
+    }
 
-        body.close()
+    @Test
+    void testNullInputStreamRequestBody() {
+        def inputStreamRequestBody = new OkHttpRequestExecutor.InputStreamRequestBody(null, com.okta.commons.http.MediaType.TEXT_PLAIN)
+        def buffer = new Buffer()
+
+        assertThat(inputStreamRequestBody.contentLength(), is(-1L))
+        inputStreamRequestBody.writeTo(buffer)
+        assertThat(buffer.readUtf8(), is(emptyString()))
     }
 
     @DataProvider
