@@ -33,10 +33,9 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import okhttp3.internal.Util;
 import okio.BufferedSink;
+import okio.BufferedSource;
 import okio.Okio;
-import okio.Source;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -172,13 +171,13 @@ public class OkHttpRequestExecutor implements RequestExecutor {
 
     private static class InputStreamRequestBody extends RequestBody {
 
-        private final InputStream inputStream;
-
         private final okhttp3.MediaType okContentType;
 
+        private final BufferedSource bufferedSource;
+
         private InputStreamRequestBody(InputStream inputStream, MediaType contentType) {
-            this.inputStream = inputStream;
             this.okContentType = okhttp3.MediaType.parse(contentType.toString());
+            this.bufferedSource = Okio.buffer(Okio.source(inputStream));
         }
 
         @Override
@@ -188,18 +187,12 @@ public class OkHttpRequestExecutor implements RequestExecutor {
 
         @Override
         public void writeTo(BufferedSink sink) throws IOException {
-            Source source = null;
-            try {
-                source = Okio.source(inputStream);
-                sink.writeAll(source);
-            } finally {
-                Util.closeQuietly(source);
-            }
+            sink.writeAll(bufferedSource.peek());
         }
 
         @Override
         public long contentLength() throws IOException {
-            return inputStream != null ? inputStream.available() : super.contentLength();
+            return bufferedSource.peek().readByteArray().length;
         }
     }
 }
