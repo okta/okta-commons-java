@@ -171,11 +171,14 @@ public class OkHttpRequestExecutor implements RequestExecutor {
 
     private static class InputStreamRequestBody extends RequestBody {
 
+        private final InputStream inputStream;
+
         private final okhttp3.MediaType okContentType;
 
         private final BufferedSource bufferedSource;
 
         private InputStreamRequestBody(InputStream inputStream, MediaType contentType) {
+            this.inputStream = inputStream;
             this.okContentType = okhttp3.MediaType.parse(contentType.toString());
             this.bufferedSource = Okio.buffer(Okio.source(inputStream));
         }
@@ -187,7 +190,11 @@ public class OkHttpRequestExecutor implements RequestExecutor {
 
         @Override
         public void writeTo(BufferedSink sink) throws IOException {
-            sink.writeAll(bufferedSource.peek());
+            try {
+                sink.writeAll(bufferedSource.peek());
+            } finally {
+                inputStream.close();
+            }
         }
 
         @Override
