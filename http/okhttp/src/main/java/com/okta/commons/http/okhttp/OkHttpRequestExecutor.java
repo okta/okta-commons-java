@@ -69,6 +69,10 @@ public class OkHttpRequestExecutor implements RequestExecutor {
 
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
 
+        return configureOkHttpClient(httpClientConfiguration, clientBuilder);
+    }
+
+    static OkHttpClient configureOkHttpClient(HttpClientConfiguration httpClientConfiguration, OkHttpClient.Builder clientBuilder) {
         clientBuilder.connectTimeout(httpClientConfiguration.getConnectionTimeout(), TimeUnit.SECONDS);
         clientBuilder.readTimeout(httpClientConfiguration.getConnectionTimeout(), TimeUnit.SECONDS);
         clientBuilder.writeTimeout(httpClientConfiguration.getConnectionTimeout(), TimeUnit.SECONDS);
