@@ -59,7 +59,6 @@ public class OkHttpRequestExecutor implements RequestExecutor {
         this(httpClientConfiguration, createOkHttpClient(httpClientConfiguration));
     }
 
-    // exposed for testing
     OkHttpRequestExecutor(HttpClientConfiguration httpClientConfiguration, OkHttpClient okHttpClient) {
 
         this.client = okHttpClient;
