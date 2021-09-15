@@ -30,10 +30,20 @@ public class OkHttpRequestExecutorFactory implements RequestExecutorFactory {
 
     private final OkHttpClient client;
 
+    /**
+     * @since 1.2.0
+     */
     public OkHttpRequestExecutorFactory() {
         this(null);
     }
 
+    /**
+     * Creates an `OkHttpRequestExecutorFactory` that creates a `OkHttpRequestExecutor` instances
+     * that uses a shared `OkHttpClient`.
+     *
+     * @param client a custom configured `OkHttpClient`.
+     * @since 1.3.0
+     */
     public OkHttpRequestExecutorFactory(OkHttpClient client) {
         this.client = client;
     }
@@ -42,7 +52,8 @@ public class OkHttpRequestExecutorFactory implements RequestExecutorFactory {
     public RequestExecutor create(HttpClientConfiguration clientConfiguration) {
         OkHttpRequestExecutor executor;
         if (client != null) {
-            executor = new OkHttpRequestExecutor(clientConfiguration, client);
+            OkHttpClient configuredClient = OkHttpRequestExecutor.configureOkHttpClient(clientConfiguration, client.newBuilder());
+            executor = new OkHttpRequestExecutor(clientConfiguration, configuredClient);
         } else {
             executor = new OkHttpRequestExecutor(clientConfiguration);
         }
