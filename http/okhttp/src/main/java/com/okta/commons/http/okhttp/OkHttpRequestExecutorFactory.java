@@ -42,7 +42,7 @@ public class OkHttpRequestExecutorFactory implements RequestExecutorFactory {
      * that uses a shared `OkHttpClient`.
      *
      * @param client a custom configured `OkHttpClient`.
-     * @since 1.3.0
+     * @since 1.2.8
      */
     public OkHttpRequestExecutorFactory(OkHttpClient client) {
         this.client = client;
