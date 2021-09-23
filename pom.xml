@@ -20,12 +20,12 @@
     <parent>
         <groupId>com.okta</groupId>
         <artifactId>okta-parent</artifactId>
-        <version>18</version>
+        <version>21</version>
     </parent>
 
     <groupId>com.okta.commons</groupId>
     <artifactId>okta-commons-root</artifactId>
-    <version>1.2.6-SNAPSHOT</version>
+    <version>1.2.9-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Okta Commons</name>
@@ -35,7 +35,7 @@
 
     <properties>
         <github.slug>okta/okta-commons-java</github.slug>
-        <okta.commons.previousVersion>1.1.0</okta.commons.previousVersion>
+        <okta.commons.previousVersion>1.2.7</okta.commons.previousVersion>
     </properties>
 
     <modules>
@@ -54,27 +54,27 @@
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-commons-lang</artifactId>
-                <version>1.2.6-SNAPSHOT</version>
+                <version>1.2.9-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-config-check</artifactId>
-                <version>1.2.6-SNAPSHOT</version>
+                <version>1.2.9-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-http-api</artifactId>
-                <version>1.2.6-SNAPSHOT</version>
+                <version>1.2.9-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-http-okhttp</artifactId>
-                <version>1.2.6-SNAPSHOT</version>
+                <version>1.2.9-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.okta.commons</groupId>
                 <artifactId>okta-http-httpclient</artifactId>
-                <version>1.2.6-SNAPSHOT</version>
+                <version>1.2.9-SNAPSHOT</version>
             </dependency>
 
             <dependency>

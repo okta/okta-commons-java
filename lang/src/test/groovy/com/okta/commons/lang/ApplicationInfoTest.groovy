@@ -42,7 +42,7 @@ class ApplicationInfoTest {
 
         def info = appInfo.getFullEntryStringUsingManifest(Test.class.getName(), "testng")
         assertThat info.name, is("testng")
-        assertThat info.version, is("7.0.0") // tied to version in pom.xml
+        assertThat info.version, is("7.4.0") // tied to version in pom.xml
 
         info = appInfo.getFullEntryStringUsingManifest(Mockito.class.getName(), "mockito")
         assertThat info.name, is("mockito")

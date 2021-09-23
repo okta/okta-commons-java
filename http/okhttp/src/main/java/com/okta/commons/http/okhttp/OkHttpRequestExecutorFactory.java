@@ -20,6 +20,7 @@ import com.okta.commons.http.RequestExecutor;
 import com.okta.commons.http.RequestExecutorFactory;
 import com.okta.commons.http.RetryRequestExecutor;
 import com.okta.commons.http.config.HttpClientConfiguration;
+import okhttp3.OkHttpClient;
 
 /**
  * @since 1.2.0
@@ -27,8 +28,35 @@ import com.okta.commons.http.config.HttpClientConfiguration;
 @AutoService(RequestExecutorFactory.class)
 public class OkHttpRequestExecutorFactory implements RequestExecutorFactory {
 
+    private final OkHttpClient client;
+
+    /**
+     * @since 1.2.0
+     */
+    public OkHttpRequestExecutorFactory() {
+        this(null);
+    }
+
+    /**
+     * Creates an `OkHttpRequestExecutorFactory` that creates a `OkHttpRequestExecutor` instances
+     * that uses a shared `OkHttpClient`.
+     *
+     * @param client a custom configured `OkHttpClient`.
+     * @since 1.2.8
+     */
+    public OkHttpRequestExecutorFactory(OkHttpClient client) {
+        this.client = client;
+    }
+
     @Override
     public RequestExecutor create(HttpClientConfiguration clientConfiguration) {
-        return new RetryRequestExecutor(clientConfiguration, new OkHttpRequestExecutor(clientConfiguration));
+        OkHttpRequestExecutor executor;
+        if (client != null) {
+            OkHttpClient configuredClient = OkHttpRequestExecutor.configureOkHttpClient(clientConfiguration, client.newBuilder());
+            executor = new OkHttpRequestExecutor(clientConfiguration, configuredClient);
+        } else {
+            executor = new OkHttpRequestExecutor(clientConfiguration);
+        }
+        return new RetryRequestExecutor(clientConfiguration, executor);
     }
 }
