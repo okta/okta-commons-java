@@ -60,6 +60,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -336,21 +337,26 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         // check pops first
         String configuredValue = props.get(key);
 
-        // if empty attempt to find system property
-        if (Strings.isEmpty(configuredValue)) {
-            configuredValue = System.getProperty(sysPropName);
-        }
+        Optional<Integer> configuredInt = safeParseInt(configuredValue, key);
 
-        // don't parse value if it's null or unset
-        if (!Strings.isEmpty(configuredValue)) {
-            try {
-                return Integer.parseInt(configuredValue);
-            } catch (NumberFormatException e) {
-                log.warn("Failed to parse configuration property [{}]", key);
-            }
+        // if empty attempt to find system property
+        if (!configuredInt.isPresent()) {
+            configuredInt = safeParseInt(System.getProperty(sysPropName), sysPropName);
         }
 
         // no configuration value was found or could be parsed
-        return null;
+        return configuredInt.orElse(null);
+    }
+
+    private Optional<Integer> safeParseInt(String value, String configKey) {
+        // don't parse value if it's null or unset
+        if (!Strings.isEmpty(value)) {
+            try {
+                return Optional.of(Integer.parseInt(value));
+            } catch (NumberFormatException e) {
+                log.warn("Failed to parse configuration property [{}] - value [{}]", configKey, value);
+            }
+        }
+        return Optional.empty();
     }
 }
