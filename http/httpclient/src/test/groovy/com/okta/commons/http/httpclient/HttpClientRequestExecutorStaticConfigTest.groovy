@@ -22,12 +22,14 @@ import org.testng.IHookable
 import org.testng.ITestResult
 import org.testng.SkipException
 import org.testng.annotations.DataProvider
+import org.testng.annotations.Listeners
 import org.testng.annotations.Test
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.is
 
-class HttpClientRequestExecutorStaticConfigTest implements IHookable {
+@Listeners([RestoreSystemProperties])
+class HttpClientRequestExecutorStaticConfigTest {
 
     @Test(dataProvider = "validateAfterInactivity")
     void validateAfterInactivitySysPropOnly(String configValue, int expectedValue) {
@@ -232,24 +234,6 @@ class HttpClientRequestExecutorStaticConfigTest implements IHookable {
                 throw e
             }
             return e
-        }
-    }
-
-    @Override
-    void run(IHookCallBack callBack, ITestResult testResult) {
-        def originalProperties = System.getProperties()
-        Properties copy = new Properties()
-        copy.putAll(originalProperties)
-        System.setProperties(copy)
-        try {
-            // run the tests
-            if (!System.getProperty("java.version").startsWith("1.8")) {
-                throw new SkipException("Test test only supported on JDK 8, see https://github.com/okta/okta-sdk-java/issues/276")
-            }
-            callBack.runTestMethod(testResult)
-
-        } finally {
-            System.setProperties(originalProperties)
         }
     }
 }
