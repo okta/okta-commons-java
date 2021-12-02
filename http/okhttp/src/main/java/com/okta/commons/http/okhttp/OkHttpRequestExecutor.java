@@ -202,7 +202,8 @@ public class OkHttpRequestExecutor implements RequestExecutor {
             try {
                 sink.writeAll(bufferedSource.peek());
             } finally {
-                Util.closeQuietly(inputStream);
+                if (inputStream != null)
+                   Util.closeQuietly(inputStream);
             }
         }
 
