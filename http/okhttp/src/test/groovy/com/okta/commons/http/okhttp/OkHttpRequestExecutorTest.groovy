@@ -164,7 +164,7 @@ class OkHttpRequestExecutorTest {
     }
 
     @Test
-    void testExecuteRequestPostForFileUploading() {
+    void testExecuteRequestPostForMultipartFileUpload() {
 
         def content = "content-to-test"
         def okResponse = stubResponse(content)
