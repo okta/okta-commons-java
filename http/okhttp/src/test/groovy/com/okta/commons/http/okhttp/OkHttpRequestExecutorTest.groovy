@@ -123,6 +123,89 @@ class OkHttpRequestExecutorTest {
         verify(requestAuthenticator).authenticate(request)
     }
 
+    @Test(dataProvider = "httpMethods")
+    void testExecuteRequests(HttpMethod httpMethod) {
+
+        def content = "content-to-test"
+        def okResponse = stubResponse(content)
+        def headers = mock(HttpHeaders)
+        def query = mock(QueryString)
+        def request = mock(Request)
+        def requestAuthenticator = mock(RequestAuthenticator)
+
+        when(request.getHeaders()).thenReturn(headers)
+        when(request.getResourceUrl()).thenReturn(new URI("https://testExecuteRequest.example.com"))
+        when(request.getQueryString()).thenReturn(query)
+        when(request.getMethod()).thenReturn(httpMethod)
+        when(request.getHeaders().getContentType()).thenReturn(com.okta.commons.http.MediaType.TEXT_PLAIN)
+
+        def interceptor = new Interceptor() {
+            @Override
+            okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
+                return okResponse
+            }
+        }
+
+        def requestExecutor = createRequestExecutor(new OkHttpClient.Builder()
+            .addInterceptor(interceptor)
+            .build(),
+            requestAuthenticator)
+
+        def response = requestExecutor.executeRequest(request)
+        def responseBody = response.body.text
+
+        assertThat responseBody, is(content)
+        assertThat response.httpStatus, is(200)
+        assertThat response.isClientError(), is(false)
+        assertThat response.isError(), is(false)
+        assertThat response.isServerError(), is(false)
+
+        verify(requestAuthenticator).authenticate(request)
+    }
+
+    @Test
+    void testExecuteRequestPostForFileUploading() {
+
+        def content = "content-to-test"
+        def okResponse = stubResponse(content)
+        def query = mock(QueryString)
+        def request = mock(Request)
+        def requestAuthenticator = mock(RequestAuthenticator)
+
+        def headers =  new HttpHeaders()
+        headers.add("x-contentType", com.okta.commons.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+        headers.add("x-fileLocation", "/path/to/file")
+        headers.add("x-fileFormDataName", "file")
+
+        when(request.getHeaders()).thenReturn(headers)
+        when(request.getResourceUrl()).thenReturn(new URI("https://testExecuteRequest.example.com"))
+        when(request.getQueryString()).thenReturn(query)
+        when(request.getMethod()).thenReturn(HttpMethod.POST)
+
+        def interceptor = new Interceptor() {
+            @Override
+            okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
+                return okResponse
+            }
+        }
+
+        def requestExecutor = createRequestExecutor(new OkHttpClient.Builder()
+            .addInterceptor(interceptor)
+            .build(),
+            requestAuthenticator)
+
+        def response = requestExecutor.executeRequest(request)
+        def responseBody = response.body.text
+
+        assertThat responseBody, is(content)
+        assertThat response.httpStatus, is(200)
+        assertThat response.isClientError(), is(false)
+        assertThat response.isError(), is(false)
+        assertThat response.isServerError(), is(false)
+
+        verify(requestAuthenticator).authenticate(request)
+    }
+
     @Test(dataProvider = "retryableExceptions")
     void throwRetryableExceptions(Exception e) {
 
@@ -255,6 +338,16 @@ class OkHttpRequestExecutorTest {
 
         return client == null ? new OkHttpRequestExecutor(clientConfiguration)
                               : new OkHttpRequestExecutor(clientConfiguration, client)
+    }
+
+    @DataProvider
+    Object[] httpMethods() {
+        return [
+            HttpMethod.POST,
+            HttpMethod.PUT,
+            HttpMethod.DELETE,
+            HttpMethod.HEAD
+        ]
     }
 
     static <T extends Throwable> T expect(Class<T> catchMe, Closure closure) {
