@@ -16,6 +16,7 @@
  */
 package com.okta.commons.http.okhttp;
 
+import com.google.common.base.Strings;
 import com.okta.commons.http.DefaultResponse;
 import com.okta.commons.http.HttpException;
 import com.okta.commons.http.HttpHeaders;
@@ -30,6 +31,7 @@ import com.okta.commons.http.config.Proxy;
 import okhttp3.CookieJar;
 import okhttp3.Credentials;
 import okhttp3.HttpUrl;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -40,6 +42,7 @@ import okio.BufferedSource;
 import okio.Okio;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -105,7 +108,7 @@ public class OkHttpRequestExecutor implements RequestExecutor {
 
         HttpUrl.Builder urlBuilder = HttpUrl.get(request.getResourceUrl()).newBuilder();
 
-        // query parms
+        // query params
         request.getQueryString().forEach(urlBuilder::addQueryParameter);
 
         okhttp3.Request.Builder okRequestBuilder = new okhttp3.Request.Builder()
@@ -113,6 +116,12 @@ public class OkHttpRequestExecutor implements RequestExecutor {
 
         // headers
         request.getHeaders().toSingleValueMap().forEach(okRequestBuilder::addHeader);
+
+        boolean isMultipartFormDataForFileUploading = false;
+        String xContentType = fetchHeaderValueAndRemoveIfExists(request, "x-contentType");
+        if(!Strings.isNullOrEmpty(xContentType)) {
+            isMultipartFormDataForFileUploading = xContentType.equals(MediaType.MULTIPART_FORM_DATA_VALUE);
+        }
 
         HttpMethod method = request.getMethod();
         switch (method) {
@@ -126,7 +135,21 @@ public class OkHttpRequestExecutor implements RequestExecutor {
                 okRequestBuilder.head();
                 break;
             case POST:
-                okRequestBuilder.post(new InputStreamRequestBody(request.getBody(), request.getHeaders().getContentType()));
+                if(isMultipartFormDataForFileUploading) {
+                    String fileLocation = fetchHeaderValueAndRemoveIfExists(request, "x-fileLocation");
+                    String formDataPartName = fetchHeaderValueAndRemoveIfExists(request, "x-fileFormDataName");
+                    File file = new File(fileLocation);
+                    RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                        .addFormDataPart(
+                            formDataPartName,
+                            file.getName(),
+                            RequestBody.create(null, file)
+                        )
+                        .build();
+                    okRequestBuilder.post(requestBody);
+                } else {
+                    okRequestBuilder.post(new InputStreamRequestBody(request.getBody(), request.getHeaders().getContentType()));
+                }
                 break;
             case PUT:
                 // TODO support 100-continue ?
@@ -145,6 +168,15 @@ public class OkHttpRequestExecutor implements RequestExecutor {
         } catch (IOException e) {
             throw new HttpException(e.getMessage(), e);
         }
+    }
+
+    private String fetchHeaderValueAndRemoveIfExists(Request request, String headerName) {
+        String result = null;
+        if(request.getHeaders().toSingleValueMap().containsKey(headerName)) {
+            result = request.getHeaders().toSingleValueMap().get(headerName);
+            request.getHeaders().remove(headerName);
+        }
+        return result;
     }
 
     private Response toSdkResponse(okhttp3.Response okResponse) throws IOException {
