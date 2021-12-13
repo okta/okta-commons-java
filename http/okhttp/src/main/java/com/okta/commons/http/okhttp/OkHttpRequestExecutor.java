@@ -16,7 +16,6 @@
  */
 package com.okta.commons.http.okhttp;
 
-import com.google.common.base.Strings;
 import com.okta.commons.http.DefaultResponse;
 import com.okta.commons.http.HttpException;
 import com.okta.commons.http.HttpHeaders;
@@ -24,10 +23,12 @@ import com.okta.commons.http.HttpMethod;
 import com.okta.commons.http.MediaType;
 import com.okta.commons.http.Request;
 import com.okta.commons.http.RequestExecutor;
+import com.okta.commons.http.RequestUtils;
 import com.okta.commons.http.Response;
 import com.okta.commons.http.authc.RequestAuthenticator;
 import com.okta.commons.http.config.HttpClientConfiguration;
 import com.okta.commons.http.config.Proxy;
+import com.okta.commons.lang.Strings;
 import okhttp3.CookieJar;
 import okhttp3.Credentials;
 import okhttp3.HttpUrl;
@@ -118,8 +119,8 @@ public class OkHttpRequestExecutor implements RequestExecutor {
         request.getHeaders().toSingleValueMap().forEach(okRequestBuilder::addHeader);
 
         boolean isMultipartFormDataForFileUploading = false;
-        String xContentType = fetchHeaderValueAndRemoveIfExists(request, "x-contentType");
-        if(!Strings.isNullOrEmpty(xContentType)) {
+        String xContentType = RequestUtils.fetchHeaderValueAndRemoveIfPresent(request, "x-contentType");
+        if(!Strings.isEmpty(xContentType)) {
             isMultipartFormDataForFileUploading = xContentType.equals(MediaType.MULTIPART_FORM_DATA_VALUE);
         }
 
@@ -136,8 +137,8 @@ public class OkHttpRequestExecutor implements RequestExecutor {
                 break;
             case POST:
                 if(isMultipartFormDataForFileUploading) {
-                    String fileLocation = fetchHeaderValueAndRemoveIfExists(request, "x-fileLocation");
-                    String formDataPartName = fetchHeaderValueAndRemoveIfExists(request, "x-fileFormDataName");
+                    String fileLocation = RequestUtils.fetchHeaderValueAndRemoveIfPresent(request, "x-fileLocation");
+                    String formDataPartName = RequestUtils.fetchHeaderValueAndRemoveIfPresent(request, "x-fileFormDataName");
                     File file = new File(fileLocation);
                     RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                         .addFormDataPart(
@@ -168,15 +169,6 @@ public class OkHttpRequestExecutor implements RequestExecutor {
         } catch (IOException e) {
             throw new HttpException(e.getMessage(), e);
         }
-    }
-
-    private String fetchHeaderValueAndRemoveIfExists(Request request, String headerName) {
-        String result = null;
-        if(request.getHeaders().toSingleValueMap().containsKey(headerName)) {
-            result = request.getHeaders().toSingleValueMap().get(headerName);
-            request.getHeaders().remove(headerName);
-        }
-        return result;
     }
 
     private Response toSdkResponse(okhttp3.Response okResponse) throws IOException {
