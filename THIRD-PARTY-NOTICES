@@ -13,9 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 This project includes:
-  Animal Sniffer Annotations under MIT license
   Apache Commons Codec under Apache License, Version 2.0
   Apache HttpClient under Apache License, Version 2.0
+  Apache HttpClient Mime under Apache License, Version 2.0
   Apache HttpCore under Apache License, Version 2.0
   Auto Common Libraries under Apache 2.0
   AutoService under Apache 2.0
@@ -25,10 +25,13 @@ This project includes:
   FindBugs-jsr305 under The Apache Software License, Version 2.0
   Guava InternalFutureFailureAccess and InternalFutures under The Apache Software License, Version 2.0
   Guava ListenableFuture only under The Apache Software License, Version 2.0
-  Guava: Google Core Libraries for Java under The Apache Software License, Version 2.0
+  Guava: Google Core Libraries for Java under Apache License, Version 2.0
+  IntelliJ IDEA Annotations under The Apache Software License, Version 2.0
   J2ObjC Annotations under The Apache Software License, Version 2.0
-  OkHttp under Apache 2.0
-  Okio under Apache 2.0
+  Kotlin Stdlib under The Apache License, Version 2.0
+  Kotlin Stdlib Common under The Apache License, Version 2.0
+  okhttp under The Apache Software License, Version 2.0
+  Okio under The Apache Software License, Version 2.0
   SLF4J API Module under MIT License
 
 

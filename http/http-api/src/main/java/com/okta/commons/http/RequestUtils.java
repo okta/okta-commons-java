@@ -87,4 +87,13 @@ public final class RequestUtils {
         return DATE_TIME_FORMATTER.format(inDate.toInstant());
     }
 
+
+    public static String fetchHeaderValueAndRemoveIfPresent(Request request, String headerName) {
+        String result = null;
+        if(request.getHeaders().toSingleValueMap().containsKey(headerName)) {
+            result = request.getHeaders().toSingleValueMap().get(headerName);
+            request.getHeaders().remove(headerName);
+        }
+        return result;
+    }
 }
