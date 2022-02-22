@@ -36,7 +36,6 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import okhttp3.internal.Util;
 import okio.Buffer;
 import okio.BufferedSink;
 import okio.BufferedSource;
@@ -226,8 +225,15 @@ public class OkHttpRequestExecutor implements RequestExecutor {
             try {
                 sink.writeAll(bufferedSource.peek());
             } finally {
-                if (inputStream != null)
-                   Util.closeQuietly(inputStream);
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (RuntimeException rethrown) {
+                        throw rethrown;
+                    } catch (Exception ignored) {
+                        // Ignored, we errored from trying to close the stream.
+                    }
+                }
             }
         }
 
