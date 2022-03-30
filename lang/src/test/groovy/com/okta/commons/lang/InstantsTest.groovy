@@ -31,11 +31,13 @@
 */
 package com.okta.commons.lang
 
-
+import org.hamcrest.Matchers
 import org.testng.annotations.Test
 
+import static org.hamcrest.Matchers.is
 import static org.testng.Assert.assertEquals
 import static org.testng.Assert.fail
+import static org.hamcrest.MatcherAssert.assertThat
 
 /**
  * @since 0.5.0
@@ -91,22 +93,22 @@ class InstantsTest {
         Calendar toConvert = Calendar.getInstance(tz)
         Long expected = toConvert.getTimeInMillis() - oneHourOffset // substract the offset corresponding to 1 hour
         long utcTimeStamp = Instants.convertDateToUTC(toConvert.getTimeInMillis(), tz)
-        assertEquals(expected, utcTimeStamp)
+        assertThat(expected, is(utcTimeStamp))
 
         toConvert = Calendar.getInstance(tg)
         expected = toConvert.getTimeInMillis() + (oneHourOffset * 6) // add the offset corresponding to 6 hours
         utcTimeStamp = Instants.convertDateToUTC(toConvert.getTimeInMillis(), tg)
-        assertEquals(expected, utcTimeStamp)
+        assertThat(expected, is(utcTimeStamp))
 
         // convertTimeFromUTC
         toConvert = Calendar.getInstance(utc)
         expected = toConvert.getTimeInMillis() - (oneHourOffset * 6) // substract the offset corresponding to 6 hours
         utcTimeStamp = Instants.convertDateToLocalTime(toConvert.getTimeInMillis(), tg)
-        assertEquals(expected, utcTimeStamp)
+        assertThat(expected, is(utcTimeStamp))
 
         expected = toConvert.getTimeInMillis() + oneHourOffset // add the offset corresponding to 1 hour
         utcTimeStamp = Instants.convertDateToLocalTime(toConvert.getTimeInMillis(), tz)
-        assertEquals(expected, utcTimeStamp)
+        assertThat(expected, is(utcTimeStamp))
 
         // of(year)
         GregorianCalendar beforeTestCal =  new GregorianCalendar()
