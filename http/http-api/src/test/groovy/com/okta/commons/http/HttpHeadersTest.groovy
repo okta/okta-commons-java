@@ -62,7 +62,7 @@ class HttpHeadersTest {
         httpHeaders.setAccept(mediaTypes)
 
         def acceptMediaTypes = httpHeaders.getAccept()
-        assertEquals acceptMediaTypes.size(), 2
+        assertThat acceptMediaTypes, hasSize(2)
         assertTrue acceptMediaTypes.contains(MediaType.APPLICATION_JSON)
         assertTrue acceptMediaTypes.contains(MediaType.APPLICATION_FORM_URLENCODED)
     }
@@ -71,7 +71,7 @@ class HttpHeadersTest {
     void testAcceptCharsetEmpty() {
 
         def acceptCharSets = httpHeaders.getAcceptCharset()
-        assertEquals acceptCharSets.size(), 0
+        assertThat acceptCharSets, empty()
     }
 
     @Test
@@ -81,7 +81,7 @@ class HttpHeadersTest {
         httpHeaders.setAcceptCharset(charSets)
 
         def acceptCharSets = httpHeaders.getAcceptCharset()
-        assertEquals acceptCharSets.size(), 2
+        assertThat acceptCharSets, hasSize(2)
         assertTrue acceptCharSets.contains(Charset.forName("UTF-8"))
         assertTrue acceptCharSets.contains(Charset.forName("UTF-16"))
     }
@@ -90,7 +90,7 @@ class HttpHeadersTest {
     void testAllowMethodEmpty() {
 
         def allowedMethods = httpHeaders.getAllow()
-        assertEquals allowedMethods.size(), 0
+        assertThat allowedMethods, empty()
     }
 
     @Test
@@ -100,7 +100,7 @@ class HttpHeadersTest {
         httpHeaders.setAllow(methods)
 
         def allowedMethods = httpHeaders.getAllow()
-        assertEquals allowedMethods.size(), 2
+        assertThat allowedMethods, hasSize(2)
         assertTrue allowedMethods.contains(HttpMethod.GET)
         assertTrue allowedMethods.contains(HttpMethod.POST)
     }
@@ -166,7 +166,7 @@ class HttpHeadersTest {
         assertEquals httpHeaders.get("Date"), [dateFormat.format(new Date(now))]
 
         long droppedMillis = 1000 * (now/1000).longValue()
-        assertEquals httpHeaders.getDate(), droppedMillis
+        assertThat httpHeaders.getDate(), is(droppedMillis)
     }
 
     @Test
@@ -197,7 +197,7 @@ class HttpHeadersTest {
         assertEquals httpHeaders.get("Expires"), [dateFormat.format(new Date(now))]
 
         long droppedMillis = 1000 * (now/1000).longValue()
-        assertEquals httpHeaders.getExpires(), droppedMillis
+        assertThat httpHeaders.getExpires(), is(droppedMillis)
     }
 
     @Test
@@ -212,7 +212,7 @@ class HttpHeadersTest {
         assertEquals httpHeaders.get("If-Modified-Since"), [dateFormat.format(new Date(now))]
 
         long droppedMillis = 1000 * (now/1000).longValue()
-        assertEquals httpHeaders.getIfNotModifiedSince(), droppedMillis
+        assertThat httpHeaders.getIfNotModifiedSince(), is(droppedMillis)
     }
 
     @Test
@@ -242,7 +242,7 @@ class HttpHeadersTest {
         assertEquals httpHeaders.get("Last-Modified"), [dateFormat.format(new Date(now))]
 
         long droppedMillis = 1000 * (now/1000).longValue()
-        assertEquals httpHeaders.getLastModified(), droppedMillis
+        assertThat httpHeaders.getLastModified(), is(droppedMillis)
     }
 
     @Test
@@ -289,7 +289,7 @@ class HttpHeadersTest {
         httpHeaders.setAll(headerMap)
 
         headerMap = httpHeaders.toSingleValueMap()
-        assertEquals headerMap.size(), 2
+        assertThat headerMap, aMapWithSize(2)
         assertEquals headerMap.get("Pragma"), "no-cache"
         assertEquals headerMap.get("Content-Type"), MediaType.APPLICATION_FORM_URLENCODED_VALUE
     }
@@ -349,7 +349,7 @@ class HttpHeadersTest {
         ])
 
         def keySet = httpHeaders.keySet()
-        assertEquals keySet.size(), 2
+        assertThat keySet, hasSize(2)
         assertTrue keySet.contains("Pragma")
         assertTrue keySet.contains("ETag")
     }
@@ -363,7 +363,7 @@ class HttpHeadersTest {
         ])
 
         def values = httpHeaders.values()
-        assertEquals values.size(), 2
+        assertThat values, hasSize(2)
         assertTrue values.contains(["no-cache"])
         assertTrue values.contains(["123456789"])
     }
@@ -404,7 +404,7 @@ class HttpHeadersTest {
         httpHeaders.setExpires(3600)
         httpHeaders.setLocation(new URI(location))
 
-        assertEquals httpHeaders.hashCode(), other.hashCode()
+        assertThat httpHeaders.hashCode(), is(other.hashCode())
     }
 
     @Test
