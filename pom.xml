@@ -93,7 +93,7 @@
                 <!-- compile time annotation processor -->
                 <groupId>com.google.auto.service</groupId>
                 <artifactId>auto-service</artifactId>
-                <version>1.0</version>
+                <version>1.0.1</version>
                 <optional>true</optional>
             </dependency>
 
