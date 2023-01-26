@@ -182,7 +182,7 @@
                 <plugin>
                     <groupId>com.github.siom79.japicmp</groupId>
                     <artifactId>japicmp-maven-plugin</artifactId>
-                    <version>0.15.4</version>
+                    <version>0.17.1</version>
                     <configuration>
                         <oldVersion>
                             <dependency>
@@ -197,6 +197,16 @@
                             <breakBuildOnBinaryIncompatibleModifications>true</breakBuildOnBinaryIncompatibleModifications>
                             <breakBuildBasedOnSemanticVersioning>true</breakBuildBasedOnSemanticVersioning>
                         </parameter>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>8.0.1</version>
+                    <configuration>
+                        <suppressionFile>${root.dir}/src/owasp/owasp-suppression.xml</suppressionFile>
+                        <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
+                        <name>OWASP Dependency Check</name>
                     </configuration>
                 </plugin>
             </plugins>
