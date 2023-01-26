@@ -413,11 +413,16 @@ class HttpHeadersTest {
         def headers = new HttpHeaders()
         headers.add("Link", "<https://example.com/api/v1/users?limit=200>; rel=\"self\"")
         headers.add("Link", "<https://dev-259824.oktapreview.com/api/v1/users?after=200u9wv2af0FYl791n0h7&limit=200>; rel=\"next\"")
+        headers.add("Link", "<meta.rdf>; rel=meta; as=meta")
+        headers.add("Link", "<random.link>;")
+        headers.add("Link", "<https://dev-259824.oktapreview.com/_sec/cp_challenge/sec-3-8.css>; as=style; rel=\"preload\"")
 
         def result = headers.getLinkMap()
         assertThat(result.get("self"), equalToObject("https://example.com/api/v1/users?limit=200"))
         assertThat(result.get("next"), equalToObject("https://dev-259824.oktapreview.com/api/v1/users?after=200u9wv2af0FYl791n0h7&limit=200"))
-        assertThat(result, aMapWithSize(2))
+        assertThat(result.get("meta"), equalToObject("meta.rdf"))
+        assertThat(result.get("preload"), equalToObject("https://dev-259824.oktapreview.com/_sec/cp_challenge/sec-3-8.css"))
+        assertThat(result, aMapWithSize(4))
     }
 
     @Test
