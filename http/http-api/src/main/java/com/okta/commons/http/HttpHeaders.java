@@ -515,13 +515,14 @@ public class HttpHeaders implements MultiValueMap<String, String> {
             List<String> headerValues = headers.get(LINK);
             return headerValues.stream()
                     .map(HttpHeaders::parseLinkHeader)
+                    .filter(link -> link != null)
                     .collect(Collectors.toMap(Link::getRelationType, Link::getHref));
         }
         return Collections.emptyMap();
     }
 
     private static Link parseLinkHeader(String rawHeader) {
-        Pattern pattern = Pattern.compile("\\<(.*)\\>;.*rel=\"(.*)\"");
+        Pattern pattern = Pattern.compile("<(.*)>;.*rel=\"?([^;|,|\"]*)\"?.*");
         Matcher matcher = pattern.matcher(rawHeader);
         if (matcher.matches()) {
             return new DefaultLink(matcher.group(2), matcher.group(1));
