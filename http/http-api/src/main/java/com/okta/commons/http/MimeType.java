@@ -458,18 +458,13 @@ public class MimeType implements Comparable<MimeType>, Serializable {
     }
 
     protected void appendTo(StringBuilder builder) {
-        builder.append(this.type);
-        builder.append('/');
-        builder.append(this.subtype);
+        builder.append(this.type).append('/').append(this.subtype);
         appendTo(this.parameters, builder);
     }
 
     private void appendTo(Map<String, String> map, StringBuilder builder) {
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            builder.append(';');
-            builder.append(entry.getKey());
-            builder.append('=');
-            builder.append(entry.getValue());
+            builder.append(';').append(entry.getKey()).append('=').append(entry.getValue());
         }
     }
 
