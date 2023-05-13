@@ -565,7 +565,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
         protected int compareParameters(T mimeType1, T mimeType2) {
             int paramsSize1 = mimeType1.getParameters().size();
             int paramsSize2 = mimeType2.getParameters().size();
-            return (paramsSize2 < paramsSize1 ? -1 : (paramsSize2 == paramsSize1 ? 0 : 1)); // audio/basic;level=1 < audio/basic
+            return (Integer.compare(paramsSize2, paramsSize1)); // audio/basic;level=1 < audio/basic
         }
     }
 
