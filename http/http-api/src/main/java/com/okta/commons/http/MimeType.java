@@ -224,7 +224,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
             return false;
         }
         else {
-            return ((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("'") && s.endsWith("'")));
+            return (s.charAt(0) == '"' && s.endsWith("\"")) || (s.charAt(0) == '\'' && s.endsWith("'"));
         }
     }
 
