@@ -23,19 +23,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -515,7 +503,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
             List<String> headerValues = headers.get(LINK);
             return headerValues.stream()
                     .map(HttpHeaders::parseLinkHeader)
-                    .filter(link -> link != null)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toMap(Link::getRelationType, Link::getHref));
         }
         return Collections.emptyMap();
