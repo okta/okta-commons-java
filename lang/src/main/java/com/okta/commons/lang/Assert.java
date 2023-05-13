@@ -153,7 +153,7 @@ public abstract class Assert {
      */
     public static void doesNotContain(String textToSearch, String substring, String message) {
         if (Strings.hasLength(textToSearch) && Strings.hasLength(substring) &&
-                textToSearch.indexOf(substring) != -1) {
+            textToSearch.contains(substring)) {
             throw new IllegalArgumentException(message);
         }
     }
