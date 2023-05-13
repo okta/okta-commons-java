@@ -696,7 +696,7 @@ public class MediaType extends MimeType implements Serializable {
                 int paramsSize1 = mediaType1.getParameters().size();
                 int paramsSize2 = mediaType2.getParameters().size();
                 // audio/basic;level=1 < audio/basic
-                return (paramsSize2 < paramsSize1 ? -1 : (paramsSize2 == paramsSize1 ? 0 : 1));
+                return (Integer.compare(paramsSize2, paramsSize1));
             }
         }
     };
