@@ -91,7 +91,7 @@ public class QueryString extends TreeMap<String,String> {
                 sb.append('&');
             }
 
-            sb.append(key).append("=").append(value);
+            sb.append(key).append('=').append(value);
         }
 
         return sb.toString();
