@@ -510,7 +510,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     }
 
     private static Link parseLinkHeader(String rawHeader) {
-        Pattern pattern = Pattern.compile("<(.*)>;.*rel=\"?([^;|,|\"]*)\"?.*");
+        Pattern pattern = Pattern.compile("<(.*)>;.*rel=\"?([^;|,\"]*)\"?.*");
         Matcher matcher = pattern.matcher(rawHeader);
         if (matcher.matches()) {
             return new DefaultLink(matcher.group(2), matcher.group(1));
