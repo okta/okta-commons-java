@@ -146,15 +146,11 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      * @param acceptableCharsets the acceptable charsets
      */
     public void setAcceptCharset(List<Charset> acceptableCharsets) {
-        StringBuilder builder = new StringBuilder();
-        for (Iterator<Charset> iterator = acceptableCharsets.iterator(); iterator.hasNext(); ) {
-            Charset charset = iterator.next();
-            builder.append(charset.name().toLowerCase(Locale.ENGLISH));
-            if (iterator.hasNext()) {
-                builder.append(", ");
-            }
-        }
-        set(ACCEPT_CHARSET, builder.toString());
+        String accept = acceptableCharsets.stream()
+            .map(c -> c.name().toLowerCase(Locale.ENGLISH))
+            .collect(Collectors.joining(", "));
+
+        set(ACCEPT_CHARSET, accept);
     }
 
     /**
@@ -398,15 +394,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      * @param ifNoneMatchList the new value of the header
      */
     public void setIfNoneMatch(List<String> ifNoneMatchList) {
-        StringBuilder builder = new StringBuilder();
-        for (Iterator<String> iterator = ifNoneMatchList.iterator(); iterator.hasNext(); ) {
-            String ifNoneMatch = iterator.next();
-            builder.append(ifNoneMatch);
-            if (iterator.hasNext()) {
-                builder.append(", ");
-            }
-        }
-        set(IF_NONE_MATCH, builder.toString());
+        set(IF_NONE_MATCH, String.join(", ", ifNoneMatchList));
     }
 
     /**
