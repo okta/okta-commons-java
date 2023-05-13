@@ -569,7 +569,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     public void add(String headerName, String headerValue) {
         List<String> headerValues = headers.get(headerName);
         if (headerValues == null) {
-            headerValues = new LinkedList<String>();
+            headerValues = new LinkedList<>();
             this.headers.put(headerName, headerValues);
         }
         headerValues.add(headerValue);
@@ -585,7 +585,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      * @see #add(String, String)
      */
     public void set(String headerName, String headerValue) {
-        List<String> headerValues = new LinkedList<String>();
+        List<String> headerValues = new LinkedList<>();
         headerValues.add(headerValue);
         headers.put(headerName, headerValues);
     }
@@ -597,7 +597,9 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     }
 
     public Map<String, String> toSingleValueMap() {
-        LinkedHashMap<String, String> singleValueMap = new LinkedHashMap<String, String>(this.headers.size());
+        // Sets the initial capacity while keeping the default load factor in mind.
+        int capacity = (int) ((this.headers.size())/0.75+1);
+        LinkedHashMap<String, String> singleValueMap = new LinkedHashMap<>(capacity);
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             singleValueMap.put(entry.getKey(), entry.getValue().get(0));
         }
