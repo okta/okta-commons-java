@@ -18,6 +18,7 @@ package com.okta.commons.http.httpclient;
 
 import com.okta.commons.http.HttpException;
 import com.okta.commons.http.HttpMethod;
+import com.okta.commons.http.MediaType;
 import com.okta.commons.http.QueryString;
 import com.okta.commons.http.Request;
 import com.okta.commons.http.RequestUtils;
@@ -34,7 +35,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -71,6 +74,12 @@ class HttpClientRequestFactory {
         InputStream body = request.getBody();
         long contentLength = request.getHeaders().getContentLength();
 
+        boolean isMultipartFormDataForFileUploading = false;
+        String xContentType = RequestUtils.fetchHeaderValueAndRemoveIfPresent(request, "x-contentType");
+        if(!Strings.isEmpty(xContentType)) {
+            isMultipartFormDataForFileUploading = xContentType.equals(MediaType.MULTIPART_FORM_DATA_VALUE);
+        }
+
         HttpRequestBase base;
 
         switch (method) {
@@ -85,7 +94,19 @@ class HttpClientRequestFactory {
                 break;
             case POST:
                 base = new HttpPost(uri);
-                ((HttpEntityEnclosingRequestBase)base).setEntity(new RepeatableInputStreamEntity(request));
+                if(isMultipartFormDataForFileUploading) {
+                    String fileLocation = RequestUtils.fetchHeaderValueAndRemoveIfPresent(request, "x-fileLocation");
+                    String formDataPartName = RequestUtils.fetchHeaderValueAndRemoveIfPresent(request, "x-fileFormDataName");
+                    File file = new File(fileLocation);
+                    HttpEntity entity = MultipartEntityBuilder.create()
+                        .addBinaryBody(formDataPartName, file)
+                        .build();
+                    //remove default Content-Type header
+                    request.getHeaders().remove("Content-Type");
+                    ((HttpEntityEnclosingRequestBase)base).setEntity(entity);
+                } else {
+                    ((HttpEntityEnclosingRequestBase)base).setEntity(new RepeatableInputStreamEntity(request));
+                }
                 break;
             case PUT:
                 base = new HttpPut(uri);

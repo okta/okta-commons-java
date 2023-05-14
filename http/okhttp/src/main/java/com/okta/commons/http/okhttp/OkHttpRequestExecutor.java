@@ -23,24 +23,29 @@ import com.okta.commons.http.HttpMethod;
 import com.okta.commons.http.MediaType;
 import com.okta.commons.http.Request;
 import com.okta.commons.http.RequestExecutor;
+import com.okta.commons.http.RequestUtils;
 import com.okta.commons.http.Response;
 import com.okta.commons.http.authc.RequestAuthenticator;
 import com.okta.commons.http.config.HttpClientConfiguration;
 import com.okta.commons.http.config.Proxy;
+import com.okta.commons.lang.Strings;
 import okhttp3.CookieJar;
 import okhttp3.Credentials;
 import okhttp3.HttpUrl;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import okhttp3.internal.Util;
 import okhttp3.logging.HttpLoggingInterceptor;
+
 import okio.Buffer;
 import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -127,7 +132,7 @@ public class OkHttpRequestExecutor implements RequestExecutor {
 
         HttpUrl.Builder urlBuilder = HttpUrl.get(request.getResourceUrl()).newBuilder();
 
-        // query parms
+        // query params
         request.getQueryString().forEach(urlBuilder::addQueryParameter);
 
         okhttp3.Request.Builder okRequestBuilder = new okhttp3.Request.Builder()
@@ -135,6 +140,12 @@ public class OkHttpRequestExecutor implements RequestExecutor {
 
         // headers
         request.getHeaders().toSingleValueMap().forEach(okRequestBuilder::addHeader);
+
+        boolean isMultipartFormDataForFileUploading = false;
+        String xContentType = RequestUtils.fetchHeaderValueAndRemoveIfPresent(request, "x-contentType");
+        if(!Strings.isEmpty(xContentType)) {
+            isMultipartFormDataForFileUploading = xContentType.equals(MediaType.MULTIPART_FORM_DATA_VALUE);
+        }
 
         HttpMethod method = request.getMethod();
         switch (method) {
@@ -148,7 +159,21 @@ public class OkHttpRequestExecutor implements RequestExecutor {
                 okRequestBuilder.head();
                 break;
             case POST:
-                okRequestBuilder.post(new InputStreamRequestBody(request.getBody(), request.getHeaders().getContentType()));
+                if(isMultipartFormDataForFileUploading) {
+                    String fileLocation = RequestUtils.fetchHeaderValueAndRemoveIfPresent(request, "x-fileLocation");
+                    String formDataPartName = RequestUtils.fetchHeaderValueAndRemoveIfPresent(request, "x-fileFormDataName");
+                    File file = new File(fileLocation);
+                    RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                        .addFormDataPart(
+                            formDataPartName,
+                            file.getName(),
+                            RequestBody.create(null, file)
+                        )
+                        .build();
+                    okRequestBuilder.post(requestBody);
+                } else {
+                    okRequestBuilder.post(new InputStreamRequestBody(request.getBody(), request.getHeaders().getContentType()));
+                }
                 break;
             case PUT:
                 // TODO support 100-continue ?
@@ -224,7 +249,15 @@ public class OkHttpRequestExecutor implements RequestExecutor {
             try {
                 sink.writeAll(bufferedSource.peek());
             } finally {
-                Util.closeQuietly(inputStream);
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (RuntimeException rethrown) {
+                        throw rethrown;
+                    } catch (Exception ignored) {
+                        // Ignored, we errored from trying to close the stream.
+                    }
+                }
             }
         }
 
