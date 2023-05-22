@@ -36,6 +36,9 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import okhttp3.internal.Util;
+import okhttp3.logging.HttpLoggingInterceptor;
+
 import okio.Buffer;
 import okio.BufferedSink;
 import okio.BufferedSource;
@@ -63,9 +66,30 @@ public class OkHttpRequestExecutor implements RequestExecutor {
     }
 
     OkHttpRequestExecutor(HttpClientConfiguration httpClientConfiguration, OkHttpClient okHttpClient) {
-
-        this.client = okHttpClient;
         this.requestAuthenticator = httpClientConfiguration.getRequestAuthenticator();
+
+        if (httpClientConfiguration.getRequestExecutorParams().containsKey("debug")) {
+            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+
+            switch (httpClientConfiguration.getRequestExecutorParams().get("debug").toUpperCase()){
+                case "BODY":
+                    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+                    break;
+
+                case "HEADERS":
+                    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS);
+                    break;
+
+                default:
+                    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
+            }
+
+            OkHttpClient.Builder clientBuilder = okHttpClient.newBuilder();
+            clientBuilder.networkInterceptors().add(0, loggingInterceptor);
+            this.client = clientBuilder.build();
+        } else {
+            this.client = okHttpClient;
+        }
     }
 
     private static OkHttpClient createOkHttpClient(HttpClientConfiguration httpClientConfiguration) {
