@@ -34,6 +34,7 @@ This project includes:
   Kotlin Stdlib Jdk7 under The Apache License, Version 2.0
   Kotlin Stdlib Jdk8 under The Apache License, Version 2.0
   okhttp under The Apache Software License, Version 2.0
+  OkHttp Logging Interceptor under Apache 2.0
   okio under The Apache Software License, Version 2.0
 
 
