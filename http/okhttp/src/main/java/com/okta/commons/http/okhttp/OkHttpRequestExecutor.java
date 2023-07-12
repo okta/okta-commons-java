@@ -104,7 +104,7 @@ public class OkHttpRequestExecutor implements RequestExecutor {
         clientBuilder.writeTimeout(httpClientConfiguration.getConnectionTimeout(), TimeUnit.SECONDS);
 
         clientBuilder.cookieJar(CookieJar.NO_COOKIES);
-        clientBuilder.retryOnConnectionFailure(false); // handled by SDK
+        clientBuilder.retryOnConnectionFailure(true); // fix for https://github.com/square/okhttp/issues/2738
 
         final Proxy sdkProxy = httpClientConfiguration.getProxy();
         if (sdkProxy != null) {
