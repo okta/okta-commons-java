@@ -69,7 +69,7 @@ class OkHttpRequestExecutorFactoryTest {
         assertThat okHttpClient.cookieJar(), is(cookieJar)
         assertThat client.cookieJar(), is(CookieJar.NO_COOKIES)
         assertThat okHttpClient.retryOnConnectionFailure(), is(true)
-        assertThat client.retryOnConnectionFailure(), is(false)
+        assertThat client.retryOnConnectionFailure(), is(true)
     }
 
     private static OkHttpClient okHttpClientFromExecutor(RequestExecutor executor) {

@@ -28,13 +28,13 @@ This project includes:
   Guava ListenableFuture only under The Apache Software License, Version 2.0
   Guava: Google Core Libraries for Java under Apache License, Version 2.0
   IntelliJ IDEA Annotations under The Apache Software License, Version 2.0
-  J2ObjC Annotations under The Apache Software License, Version 2.0
+  J2ObjC Annotations under Apache License, Version 2.0
   Kotlin Stdlib under The Apache License, Version 2.0
   Kotlin Stdlib Common under The Apache License, Version 2.0
   Kotlin Stdlib Jdk7 under The Apache License, Version 2.0
   Kotlin Stdlib Jdk8 under The Apache License, Version 2.0
   okhttp under The Apache Software License, Version 2.0
-  OkHttp Logging Interceptor under Apache 2.0
+  okhttp-logging-interceptor under The Apache Software License, Version 2.0
   okio under The Apache Software License, Version 2.0
 
 
