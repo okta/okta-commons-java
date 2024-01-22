@@ -37,6 +37,7 @@
         <github.slug>okta/okta-commons-java</github.slug>
         <okta.commons.previousVersion>1.3.4</okta.commons.previousVersion>
         <kotlin.lib.version>1.9.22</kotlin.lib.version>
+        <testng.version>7.7.0</testng.version>
     </properties>
 
     <modules>
