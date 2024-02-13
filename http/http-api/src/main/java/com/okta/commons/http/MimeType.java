@@ -224,7 +224,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
             return false;
         }
         else {
-            return ((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("'") && s.endsWith("'")));
+            return (s.charAt(0) == '"' && s.endsWith("\"")) || (s.charAt(0) == '\'' && s.endsWith("'"));
         }
     }
 
@@ -458,18 +458,13 @@ public class MimeType implements Comparable<MimeType>, Serializable {
     }
 
     protected void appendTo(StringBuilder builder) {
-        builder.append(this.type);
-        builder.append('/');
-        builder.append(this.subtype);
+        builder.append(this.type).append('/').append(this.subtype);
         appendTo(this.parameters, builder);
     }
 
     private void appendTo(Map<String, String> map, StringBuilder builder) {
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            builder.append(';');
-            builder.append(entry.getKey());
-            builder.append('=');
-            builder.append(entry.getValue());
+            builder.append(';').append(entry.getKey()).append('=').append(entry.getValue());
         }
     }
 
@@ -570,7 +565,7 @@ public class MimeType implements Comparable<MimeType>, Serializable {
         protected int compareParameters(T mimeType1, T mimeType2) {
             int paramsSize1 = mimeType1.getParameters().size();
             int paramsSize2 = mimeType2.getParameters().size();
-            return (paramsSize2 < paramsSize1 ? -1 : (paramsSize2 == paramsSize1 ? 0 : 1)); // audio/basic;level=1 < audio/basic
+            return (Integer.compare(paramsSize2, paramsSize1)); // audio/basic;level=1 < audio/basic
         }
     }
 
