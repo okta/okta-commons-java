@@ -302,7 +302,8 @@ public final class ApplicationInfo {
             version = version.substring(version.indexOf("Version"));
             version = version.substring(version.indexOf(" "), version.indexOf("\n")).trim();
             return version;
-
+        } catch (StringIndexOutOfBoundsException e) {
+            // WebSphere version can't be properly handled
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) { //NOPMD
