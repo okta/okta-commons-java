@@ -23,19 +23,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -158,15 +146,11 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      * @param acceptableCharsets the acceptable charsets
      */
     public void setAcceptCharset(List<Charset> acceptableCharsets) {
-        StringBuilder builder = new StringBuilder();
-        for (Iterator<Charset> iterator = acceptableCharsets.iterator(); iterator.hasNext(); ) {
-            Charset charset = iterator.next();
-            builder.append(charset.name().toLowerCase(Locale.ENGLISH));
-            if (iterator.hasNext()) {
-                builder.append(", ");
-            }
-        }
-        set(ACCEPT_CHARSET, builder.toString());
+        String accept = acceptableCharsets.stream()
+            .map(c -> c.name().toLowerCase(Locale.ENGLISH))
+            .collect(Collectors.joining(", "));
+
+        set(ACCEPT_CHARSET, accept);
     }
 
     /**
@@ -410,15 +394,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      * @param ifNoneMatchList the new value of the header
      */
     public void setIfNoneMatch(List<String> ifNoneMatchList) {
-        StringBuilder builder = new StringBuilder();
-        for (Iterator<String> iterator = ifNoneMatchList.iterator(); iterator.hasNext(); ) {
-            String ifNoneMatch = iterator.next();
-            builder.append(ifNoneMatch);
-            if (iterator.hasNext()) {
-                builder.append(", ");
-            }
-        }
-        set(IF_NONE_MATCH, builder.toString());
+        set(IF_NONE_MATCH, String.join(", ", ifNoneMatchList));
     }
 
     /**
@@ -515,14 +491,14 @@ public class HttpHeaders implements MultiValueMap<String, String> {
             List<String> headerValues = headers.get(LINK);
             return headerValues.stream()
                     .map(HttpHeaders::parseLinkHeader)
-                    .filter(link -> link != null)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toMap(Link::getRelationType, Link::getHref));
         }
         return Collections.emptyMap();
     }
 
     private static Link parseLinkHeader(String rawHeader) {
-        Pattern pattern = Pattern.compile("<(.*)>;.*rel=\"?([^;|,|\"]*)\"?.*");
+        Pattern pattern = Pattern.compile("<(.*)>;.*rel=\"?([^;|,\"]*)\"?.*");
         Matcher matcher = pattern.matcher(rawHeader);
         if (matcher.matches()) {
             return new DefaultLink(matcher.group(2), matcher.group(1));
@@ -581,7 +557,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     public void add(String headerName, String headerValue) {
         List<String> headerValues = headers.get(headerName);
         if (headerValues == null) {
-            headerValues = new LinkedList<String>();
+            headerValues = new LinkedList<>();
             this.headers.put(headerName, headerValues);
         }
         headerValues.add(headerValue);
@@ -597,7 +573,7 @@ public class HttpHeaders implements MultiValueMap<String, String> {
      * @see #add(String, String)
      */
     public void set(String headerName, String headerValue) {
-        List<String> headerValues = new LinkedList<String>();
+        List<String> headerValues = new LinkedList<>();
         headerValues.add(headerValue);
         headers.put(headerName, headerValues);
     }
@@ -609,7 +585,9 @@ public class HttpHeaders implements MultiValueMap<String, String> {
     }
 
     public Map<String, String> toSingleValueMap() {
-        LinkedHashMap<String, String> singleValueMap = new LinkedHashMap<String, String>(this.headers.size());
+        // Sets the initial capacity while keeping the default load factor in mind.
+        int capacity = (int) ((this.headers.size())/0.75+1);
+        LinkedHashMap<String, String> singleValueMap = new LinkedHashMap<>(capacity);
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             singleValueMap.put(entry.getKey(), entry.getValue().get(0));
         }
