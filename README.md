@@ -3,7 +3,6 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Support](https://img.shields.io/badge/support-Developer%20Forum-blue.svg)][devforum]
 <!-- [![API Reference](https://img.shields.io/badge/docs-reference-lightgrey.svg)][javadocs] -->
-[![Build Status](https://travis-ci.com/okta/okta-commons-java.svg?branch=master)](https://travis-ci.com/okta/okta-commons-java)
 [![Build Status](https://github.com/github/docs/actions/workflows/build_and_test.yml/badge.svg)]
 
 
