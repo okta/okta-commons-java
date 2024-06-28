@@ -92,8 +92,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
     private final Map<String, Integer> requestExecutorParams = new HashMap<>();
 
-    @SuppressWarnings("PMD.CloseResource")
-    @SuppressWarnings({"deprecation"})
+    @SuppressWarnings({"PMD.CloseResource"})
     public HttpClientRequestExecutor(HttpClientConfiguration clientConfiguration) {
 
         Proxy proxy = clientConfiguration.getProxy();
