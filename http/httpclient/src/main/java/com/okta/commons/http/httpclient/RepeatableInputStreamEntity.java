@@ -60,6 +60,7 @@ class RepeatableInputStreamEntity extends BasicHttpEntity {
      * @param request The details of the request being written out (content type,
      *                content length, and content).
      */
+    @SuppressWarnings("PMD.CloseResource")
     RepeatableInputStreamEntity(Request request) {
         setChunked(false);
 

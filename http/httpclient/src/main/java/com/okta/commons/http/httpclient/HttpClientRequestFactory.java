@@ -67,6 +67,7 @@ class HttpClientRequestFactory {
      * @return The converted HttpClient method object with any parameters,
      *         headers, etc. from the original request set.
      */
+    @SuppressWarnings("PMD.CloseResource")
     HttpRequestBase createHttpClientRequest(Request request, HttpEntity previousEntity) {
 
         HttpMethod method = request.getMethod();

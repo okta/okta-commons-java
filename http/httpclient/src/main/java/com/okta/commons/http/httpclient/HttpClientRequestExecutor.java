@@ -92,6 +92,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
 
     private final Map<String, Integer> requestExecutorParams = new HashMap<>();
 
+    @SuppressWarnings("PMD.CloseResource")
     @SuppressWarnings({"deprecation"})
     public HttpClientRequestExecutor(HttpClientConfiguration clientConfiguration) {
 
@@ -195,6 +196,7 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         return EntityUtils.toByteArray(entity);
     }
 
+    @SuppressWarnings("PMD.CloseResource")
     protected Response toSdkResponse(HttpResponse httpResponse) throws IOException {
 
         int httpStatus = httpResponse.getStatusLine().getStatusCode();
