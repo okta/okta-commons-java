@@ -14,21 +14,21 @@ jobs:
 
   jdk8:
     docker:
-      - image: cimg/openjdk:8.0.402
+      - image: cimg/openjdk:8.0.322
     environment:
         JVM_OPTS: -Xmx3200m
     steps: *build_steps
   
   jdk11:
     docker:
-      - image: cimg/openjdk:11.0.22
+      - image: cimg/openjdk:11.0.13
     environment:
         JVM_OPTS: -Xmx3200m
     steps: *build_steps
           
   jdk17:
     docker:
-      - image: cimg/openjdk:17.0.11
+      - image: cimg/openjdk:17.0.4
     environment:
         JVM_OPTS: -Xmx3200m
     steps: *build_steps
@@ -42,7 +42,7 @@ jobs:
 
   snyk-scan:
     docker:
-      - image: cimg/openjdk:17.0.11
+      - image: cimg/openjdk:17.0.4
     steps:
       - checkout
       - run: ./mvnw -ntp clean install -Pci -Dmaven.test.skip.exec=true
@@ -60,10 +60,9 @@ workflows:
       - jdk11
       - jdk17
       - jdk21
-
   semgrep:
     jobs:
-      - jdk17
+      - jdk21
       - general-platform-helpers/job-semgrep-prepare:
           name: semgrep-prepare
       - general-platform-helpers/job-semgrep-scan:
