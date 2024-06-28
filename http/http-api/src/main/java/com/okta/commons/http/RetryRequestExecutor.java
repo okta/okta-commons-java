@@ -57,6 +57,7 @@ public final class RetryRequestExecutor implements RequestExecutor {
         }
     }
 
+    @SuppressWarnings("PMD.CloseResource")
     @Override
     public Response executeRequest(Request request) throws HttpException {
 

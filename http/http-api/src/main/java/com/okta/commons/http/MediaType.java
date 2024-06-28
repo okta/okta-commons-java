@@ -659,7 +659,7 @@ public class MediaType extends MimeType implements Serializable {
         Assert.notNull(mediaTypes, "'mediaTypes' must not be null");
         if (mediaTypes.size() > 1) {
             Collections.sort(mediaTypes,
-                    MediaType.SPECIFICITY_COMPARATOR.thenComparing(MediaType.QUALITY_VALUE_COMPARATOR));
+                    SPECIFICITY_COMPARATOR.thenComparing(QUALITY_VALUE_COMPARATOR));
         }
     }
 

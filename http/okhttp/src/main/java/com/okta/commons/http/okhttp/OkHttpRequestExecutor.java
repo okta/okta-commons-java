@@ -193,6 +193,7 @@ public class OkHttpRequestExecutor implements RequestExecutor {
         }
     }
 
+    @SuppressWarnings("PMD.CloseResource")
     private Response toSdkResponse(okhttp3.Response okResponse) throws IOException {
 
         int httpStatus = okResponse.code();
