@@ -17,7 +17,9 @@
 package com.okta.commons.http.config;
 
 import com.okta.commons.http.authc.RequestAuthenticator;
+import nl.altindag.ssl.SSLFactory;
 
+import javax.net.ssl.SSLSocketFactory;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +41,7 @@ public class HttpClientConfiguration {
     private Proxy proxy;
     private int retryMaxElapsed = 0;
     private int retryMaxAttempts = 0;
+    private SSLFactory sslFactory;
     private final Map<String, String> requestExecutorParams = new HashMap<>();
 
     public RequestAuthenticator getRequestAuthenticator() {
@@ -144,6 +147,14 @@ public class HttpClientConfiguration {
     public HttpClientConfiguration setRetryMaxAttempts(int retryMaxAttempts) {
         this.retryMaxAttempts = retryMaxAttempts;
         return this;
+    }
+
+    public SSLFactory getSslFactory() {
+        return sslFactory;
+    }
+
+    public void setSslFactory(SSLFactory sslFactory) {
+        this.sslFactory = sslFactory;
     }
 
     public void setRequestExecutorParams(Map<String, String> map) {
