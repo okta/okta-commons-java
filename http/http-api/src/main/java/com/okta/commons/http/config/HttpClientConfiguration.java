@@ -19,10 +19,8 @@ package com.okta.commons.http.config;
 import com.okta.commons.http.authc.RequestAuthenticator;
 import nl.altindag.ssl.SSLFactory;
 
-import javax.net.ssl.SSLSocketFactory;
 import java.util.HashMap;
 import java.util.Map;
-
 
 /**
  * This class holds the configuration properties use to construct a {@link com.okta.commons.http.RequestExecutor RequestExecutor}.
