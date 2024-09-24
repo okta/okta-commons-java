@@ -28,6 +28,8 @@ import com.okta.commons.http.config.HttpClientConfiguration;
 import com.okta.commons.http.config.Proxy;
 import com.okta.commons.lang.Assert;
 import com.okta.commons.lang.Strings;
+import nl.altindag.ssl.SSLFactory;
+import nl.altindag.ssl.apache4.util.Apache4SslUtils;
 import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
@@ -45,6 +47,7 @@ import org.apache.http.client.entity.GzipDecompressingEntity;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.config.ConnectionConfig;
 import org.apache.http.conn.ConnectTimeoutException;
+import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.LaxRedirectStrategy;
@@ -60,6 +63,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -157,6 +161,15 @@ public class HttpClientRequestExecutor implements RequestExecutor {
         }
 
         httpClientBuilder.setRedirectStrategy(new LaxRedirectStrategy());
+
+        // set SSL socket factory
+        if (Objects.nonNull(clientConfiguration.getSslFactory())) {
+            SSLFactory sslFactory = clientConfiguration.getSslFactory();
+
+            LayeredConnectionSocketFactory socketFactory = Apache4SslUtils.toSocketFactory(sslFactory);
+            httpClientBuilder.setSSLSocketFactory(socketFactory);
+        }
+
 
         this.httpClient = httpClientBuilder.build();
     }

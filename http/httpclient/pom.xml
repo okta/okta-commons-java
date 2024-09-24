@@ -72,6 +72,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.j3t/ssl-utils -->
+        <dependency>
+            <groupId>io.github.hakky54</groupId>
+            <artifactId>sslcontext-kickstart-for-apache4</artifactId>
+        </dependency>
         <dependency>
             <!-- compile time annotation processor -->
             <groupId>com.google.auto.service</groupId>

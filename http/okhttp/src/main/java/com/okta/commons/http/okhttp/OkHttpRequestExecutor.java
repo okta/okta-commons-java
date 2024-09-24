@@ -50,6 +50,7 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -105,6 +106,10 @@ public class OkHttpRequestExecutor implements RequestExecutor {
 
         clientBuilder.cookieJar(CookieJar.NO_COOKIES);
         clientBuilder.retryOnConnectionFailure(true); // fix for https://github.com/square/okhttp/issues/2738
+
+        if (Objects.nonNull(httpClientConfiguration.getSslFactory())) {
+            clientBuilder.sslSocketFactory(httpClientConfiguration.getSslFactory().getSslSocketFactory());
+        }
 
         final Proxy sdkProxy = httpClientConfiguration.getProxy();
         if (sdkProxy != null) {
