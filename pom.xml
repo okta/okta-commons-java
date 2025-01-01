@@ -37,7 +37,7 @@
         <github.slug>okta/okta-commons-java</github.slug>
         <okta.commons.previousVersion>2.0.1</okta.commons.previousVersion>
         <kotlin.lib.version>2.1.0</kotlin.lib.version>
-        <sslcontext.kickstart.version>8.3.7</sslcontext.kickstart.version>
+        <sslcontext.kickstart.version>9.0.0</sslcontext.kickstart.version>
         <testng.version>7.10.2</testng.version>
     </properties>
 
