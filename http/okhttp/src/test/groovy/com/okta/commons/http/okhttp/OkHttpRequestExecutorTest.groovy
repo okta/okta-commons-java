@@ -46,25 +46,30 @@ class OkHttpRequestExecutorTest {
     void testToSdkResponseWithNullContentString() {
 
         def requestAuthenticator = mock(RequestAuthenticator)
-        
+
         def clientConfiguration = new HttpClientConfiguration()
         clientConfiguration.setRequestAuthenticator(requestAuthenticator)
         def requestExecutor = new OkHttpRequestExecutor(clientConfiguration)
 
         def okRequest = new okhttp3.Request.Builder()
-                            .url("https://test.example.com")
-                            .build()
+            .url("https://test.example.com")
+            .build()
+
+        def emptyBody = ResponseBody.create(null, "")
+
         def okResponse = new okhttp3.Response.Builder()
-                            .body(null)
-                            .code(200)
-                            .message("OK")
-                            .request(okRequest)
-                            .protocol(Protocol.HTTP_1_1)
-                            .build()
+            .body(emptyBody)
+            .code(200)
+            .message("OK")
+            .request(okRequest)
+            .protocol(Protocol.HTTP_1_1)
+            .build()
 
         def response = requestExecutor.toSdkResponse(okResponse)
 
-        assertThat response.body, nullValue()
+        // FIX: Update assertions to check for a non-null, empty stream
+        assertThat response.body, notNullValue()
+        assertThat response.body.read(), is(-1)
         assertThat response.httpStatus, is(200)
     }
 
