@@ -75,7 +75,7 @@
         <!-- https://mvnrepository.com/artifact/com.github.j3t/ssl-utils -->
         <dependency>
             <groupId>io.github.hakky54</groupId>
-            <artifactId>sslcontext-kickstart-for-apache4</artifactId>
+            <artifactId>ayza-for-apache4</artifactId>
         </dependency>
         <dependency>
             <!-- compile time annotation processor -->

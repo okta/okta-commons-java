@@ -37,7 +37,7 @@
         <github.slug>okta/okta-commons-java</github.slug>
         <okta.commons.previousVersion>2.0.1</okta.commons.previousVersion>
         <kotlin.lib.version>2.2.0</kotlin.lib.version>
-        <sslcontext.kickstart.version>9.1.0</sslcontext.kickstart.version>
+        <ayza.version>10.0.0</ayza.version>
         <testng.version>7.10.2</testng.version>
     </properties>
 
@@ -104,18 +104,18 @@
 
             <dependency>
                 <groupId>io.github.hakky54</groupId>
-                <artifactId>sslcontext-kickstart</artifactId>
-                <version>${sslcontext.kickstart.version}</version>
+                <artifactId>ayza</artifactId>
+                <version>${ayza.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.hakky54</groupId>
-                <artifactId>sslcontext-kickstart-for-pem</artifactId>
-                <version>${sslcontext.kickstart.version}</version>
+                <artifactId>ayza-for-pem</artifactId>
+                <version>${ayza.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.hakky54</groupId>
-                <artifactId>sslcontext-kickstart-for-apache4</artifactId>
-                <version>${sslcontext.kickstart.version}</version>
+                <artifactId>ayza-for-apache4</artifactId>
+                <version>${ayza.version}</version>
             </dependency>
             <dependency>
                 <!-- compile time annotation processor -->
