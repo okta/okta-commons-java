@@ -40,11 +40,15 @@ public final class ConfigurationValidator {
     /**
      * Asserts the {@code url} is a well formed HTTPS URL and does not contain common typos.  The checks include:
      * <ul>
-     *     <li>Contains {yourOktaDomain}</li>
-     *     <li>Hostname ends with .com.com</li>
-     *     <li>Contains -admin.okta.com</li>
-     *     <li>Contains -admin.oktapreview.com</li>
-     *     <li>Contains -admin.okta-emea.com</li>
+     * <li>Contains {yourOktaDomain}</li>
+     * <li>Hostname ends with .com.com</li>
+     * <li>Contains -admin.okta.com</li>
+     * <li>Contains -admin.oktapreview.com</li>
+     * <li>Contains -admin.okta-emea.com</li>
+     * <li>Contains -admin.okta-gov.com</li>
+     * <li>Contains -admin.okta.mil</li>
+     * <li>Contains -admin.okta-miltest.com</li>
+     * <li>Contains -admin.trex-gov.com</li>
      * </ul>
      *
      * @param url The url to be validated
@@ -56,11 +60,15 @@ public final class ConfigurationValidator {
 
     /** Asserts the {@code url} is a well formed HTTPS URL and does not contain common typos.  The checks include:
      * <ul>
-     *     <li>Contains {yourOktaDomain}</li>
-     *     <li>Hostname ends with .com.com</li>
-     *     <li>Contains -admin.okta.com</li>
-     *     <li>Contains -admin.oktapreview.com</li>
-     *     <li>Contains -admin.okta-emea.com</li>
+     * <li>Contains {yourOktaDomain}</li>
+     * <li>Hostname ends with .com.com</li>
+     * <li>Contains -admin.okta.com</li>
+     * <li>Contains -admin.oktapreview.com</li>
+     * <li>Contains -admin.okta-emea.com</li>
+     * <li>Contains -admin.okta-gov.com</li>
+     * <li>Contains -admin.okta.mil</li>
+     * <li>Contains -admin.okta-miltest.com</li>
+     * <li>Contains -admin.trex-gov.com</li>
      * </ul>
      *
      * @param url The url to be validated
@@ -78,11 +86,15 @@ public final class ConfigurationValidator {
      * Returns a {@link ValidationResponse} checking to make sure the {@code url} is a well formed HTTPS URL and does
      * not contain common typos.  The checks include:
      * <ul>
-     *     <li>Contains {yourOktaDomain}</li>
-     *     <li>Hostname ends with .com.com</li>
-     *     <li>Contains -admin.okta.com</li>
-     *     <li>Contains -admin.oktapreview.com</li>
-     *     <li>Contains -admin.okta-emea.com</li>
+     * <li>Contains {yourOktaDomain}</li>
+     * <li>Hostname ends with .com.com</li>
+     * <li>Contains -admin.okta.com</li>
+     * <li>Contains -admin.oktapreview.com</li>
+     * <li>Contains -admin.okta-emea.com</li>
+     * <li>Contains -admin.okta-gov.com</li>
+     * <li>Contains -admin.okta.mil</li>
+     * <li>Contains -admin.okta-miltest.com</li>
+     * <li>Contains -admin.trex-gov.com</li>
      * </ul>
      *
      * @param url The url to be validated
@@ -96,13 +108,17 @@ public final class ConfigurationValidator {
      * Returns a {@link ValidationResponse} checking to make sure the {@code url} is a well formed HTTPS URL and does
      * not contain common typos.  The checks include:
      * <ul>
-     *     <li>Contains {yourOktaDomain}</li>
-     *     <li>Hostname ends with .com.com</li>
-     *     <li>Contains -admin.okta.com</li>
-     *     <li>Contains -admin.oktapreview.com</li>
-     *     <li>Contains -admin.okta-emea.com</li>
+     * <li>Contains {yourOktaDomain}</li>
+     * <li>Hostname ends with .com.com</li>
+     * <li>Contains -admin.okta.com</li>
+     * <li>Contains -admin.oktapreview.com</li>
+     * <li>Contains -admin.okta-emea.com</li>
+     * <li>Contains -admin.okta-gov.com</li>
+     * <li>Contains -admin.okta.mil</li>
+     * <li>Contains -admin.okta-miltest.com</li>
+     * <li>Contains -admin.trex-gov.com</li>
      * </ul>
-     *      *
+     * *
      * @param url The url to be validated
      * @param allowNonHttpsForTesting Allow orgUrl to be non-https, likely used for testing.
      * @return a ValidationResponse containing the validation status and message (when invalid)
@@ -145,11 +161,15 @@ public final class ConfigurationValidator {
     /**
      * Asserts the {@code url} is a well formed HTTPS URL and does not contain common typos.  The checks include:
      * <ul>
-     *     <li>Contains {yourOktaDomain}</li>
-     *     <li>Hostname ends with .com.com</li>
-     *     <li>Contains -admin.okta.com</li>
-     *     <li>Contains -admin.oktapreview.com</li>
-     *     <li>Contains -admin.okta-emea.com</li>
+     * <li>Contains {yourOktaDomain}</li>
+     * <li>Hostname ends with .com.com</li>
+     * <li>Contains -admin.okta.com</li>
+     * <li>Contains -admin.oktapreview.com</li>
+     * <li>Contains -admin.okta-emea.com</li>
+     * <li>Contains -admin.okta-gov.com</li>
+     * <li>Contains -admin.okta.mil</li>
+     * <li>Contains -admin.okta-miltest.com</li>
+     * <li>Contains -admin.trex-gov.com</li>
      * </ul>
      *
      * @param url The url to be validated
@@ -163,11 +183,15 @@ public final class ConfigurationValidator {
      * Returns a {@link ValidationResponse} checking the {@code url} is a well formed HTTPS URL and
      * does not contain common typos.  The checks include:
      * <ul>
-     *     <li>Contains {yourOktaDomain}</li>
-     *     <li>Hostname ends with .com.com</li>
-     *     <li>Contains -admin.okta.com</li>
-     *     <li>Contains -admin.oktapreview.com</li>
-     *     <li>Contains -admin.okta-emea.com</li>
+     * <li>Contains {yourOktaDomain}</li>
+     * <li>Hostname ends with .com.com</li>
+     * <li>Contains -admin.okta.com</li>
+     * <li>Contains -admin.oktapreview.com</li>
+     * <li>Contains -admin.okta-emea.com</li>
+     * <li>Contains -admin.okta-gov.com</li>
+     * <li>Contains -admin.okta.mil</li>
+     * <li>Contains -admin.okta-miltest.com</li>
+     * <li>Contains -admin.trex-gov.com</li>
      * </ul>
      *
      * @param url The url to be validated
@@ -253,13 +277,17 @@ public final class ConfigurationValidator {
                 } else if (host.endsWith(".com.com")){
                     response.setMessage(formattedErrorMessage(keyPrefix + ".invalid", url));
                 } else if (host.endsWith("-admin.okta.com")
-                        || host.endsWith("-admin.oktapreview.com")
-                        || host.endsWith("-admin.okta-emea.com")){
-                        response.setMessage(formattedErrorMessage(keyPrefix + ".containsAdmin", url));
+                    || host.endsWith("-admin.oktapreview.com")
+                    || host.endsWith("-admin.okta-emea.com")
+                    || host.endsWith("-admin.okta-gov.com")
+                    || host.endsWith("-admin.okta.mil")
+                    || host.endsWith("-admin.okta-miltest.com")
+                    || host.endsWith("-admin.trex-gov.com")) {
+                    response.setMessage(formattedErrorMessage(keyPrefix + ".containsAdmin", url));
                 }
             } catch (MalformedURLException e) {
                 response.setMessage(formattedErrorMessage(keyPrefix + ".invalid", url))
-                        .setException(e);
+                    .setException(e);
             }
         }
 

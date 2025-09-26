@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.containsString
  * Tests for {link ConfigurationValidator}.
  */
 class ConfigurationValidatorTest {
-    
+
     @Test
     void nullBaseUrl() {
         def e = expect {ConfigurationValidator.assertOrgUrl(null)}
@@ -81,6 +81,18 @@ class ConfigurationValidatorTest {
         assertThat(e.message, containsString("Your Okta domain should not contain -admin"))
 
          e = expect {ConfigurationValidator.assertOrgUrl("https://example-admin.okta-emea.com")}
+        assertThat(e.message, containsString("Your Okta domain should not contain -admin"))
+
+        e = expect {ConfigurationValidator.assertOrgUrl("https://example-admin.okta-gov.com")}
+        assertThat(e.message, containsString("Your Okta domain should not contain -admin"))
+
+        e = expect {ConfigurationValidator.assertOrgUrl("https://example-admin.okta.mil")}
+        assertThat(e.message, containsString("Your Okta domain should not contain -admin"))
+
+        e = expect {ConfigurationValidator.assertOrgUrl("https://example-admin.okta-miltest.com")}
+        assertThat(e.message, containsString("Your Okta domain should not contain -admin"))
+
+        e = expect {ConfigurationValidator.assertOrgUrl("https://example-admin.trex-gov.com")}
         assertThat(e.message, containsString("Your Okta domain should not contain -admin"))
     }
 
@@ -160,6 +172,18 @@ class ConfigurationValidatorTest {
 
         e = expect {ConfigurationValidator.assertIssuer("https://example-aDmIn.okTa-emea.com/oauth/default")}
         assertThat(e.message, containsString("Your Okta Issuer URL should not contain -admin"))
+
+        e = expect {ConfigurationValidator.assertIssuer("https://example-admin.okta-gov.com/oauth/default")}
+        assertThat(e.message, containsString("Your Okta Issuer URL should not contain -admin"))
+
+        e = expect {ConfigurationValidator.assertIssuer("https://example-admin.okta.mil/oauth/default")}
+        assertThat(e.message, containsString("Your Okta Issuer URL should not contain -admin"))
+
+        e = expect {ConfigurationValidator.assertIssuer("https://example-admin.okta-miltest.com/oauth/default")}
+        assertThat(e.message, containsString("Your Okta Issuer URL should not contain -admin"))
+
+        e = expect {ConfigurationValidator.assertIssuer("https://example-admin.trex-gov.com/oauth/default")}
+        assertThat(e.message, containsString("Your Okta Issuer URL should not contain -admin"))
     }
 
     @Test
@@ -234,7 +258,7 @@ class ConfigurationValidatorTest {
         // just make sure it doesn't throw
         ConfigurationValidator.assertClientSecret("some-other-text")
     }
-    
+
     static def expect = { Closure callMe ->
         try {
             callMe.call()
@@ -246,5 +270,5 @@ class ConfigurationValidatorTest {
             return e
         }
     }
-    
+
 }
