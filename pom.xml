@@ -182,6 +182,23 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <configuration>
+                        <skip>true</skip>
+                        <ossIndexServerId>sonatype-oss-index</ossIndexServerId>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.6.0</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <publishingServerId>central-sonatype-upload</publishingServerId>
+                    </configuration>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <configuration>
@@ -230,6 +247,14 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <configuration>
+                    <ossIndexUsername>${env.OSS_EMAIL}</ossIndexUsername> <!-- the account's email -->
+                    <ossIndexPassword>${env.OSS_TOKEN}</ossIndexPassword>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
