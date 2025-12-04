@@ -26,6 +26,11 @@
             <password>${env.CENTRAL_SECRET}</password>
         </server>
         <server>
+            <id>sonatype-nexus-snapshots</id>
+            <username>${env.OSSRH_USERNAME}</username>
+            <password>${env.OSSRH_SECRET}</password>
+        </server>
+        <server>
             <id>sonatype-oss-index</id>
             <username>${env.OSS_EMAIL}</username>
             <password>${env.OSS_TOKEN}</password>
